@@ -1,0 +1,19 @@
+# ignore everything
+*
+
+# except these files
+!.gitignore
+
+!README.md
+
+!package.json
+!yarn.lock
+
+!babel.config.js
+!eslint.config.js
+!jest.config.js
+!tsconfig.json
+
+!src
+
+!**/*.ts

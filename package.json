@@ -1,0 +1,41 @@
+{
+  "name": "mocktender",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "yarn start ./src/index.ts",
+    "lint": "eslint --fix",
+    "start": "node --experimental-strip-types",
+    "test": "jest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7",
+    "@babel/preset-typescript": "^7",
+    "@eslint/js": "^9",
+    "@types/jest": "^29",
+    "eslint": "^9",
+    "globals": "^16",
+    "jest": "^29",
+    "typescript": "^5",
+    "typescript-eslint": "^8"
+  },
+  "comments": {
+    "peerDependencies": {
+      "typescript": "Typescript"
+    },
+    "devDependencies": {
+      "@babel/preset-env": "Jest TS support",
+      "@babel/preset-typescript": "Jest TS support",
+      "@eslint/js": "ESLint JS plugin",
+      "@types/jest": "Jest types",
+      "eslint": "ESLint",
+      "globals": "Eslint dependency",
+      "jest": "Testing framework",
+      "typescript": "Typescript",
+      "typescript-eslint": "ESLint TS plugin"
+    }
+  }
+}
