@@ -3,10 +3,11 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "yarn start ./src/index.ts",
+    "build": "tsc",
+    "dev": "yarn start ./src/cmd/tracer/devrun.ts",
     "lint": "eslint --fix",
-    "start": "node --experimental-strip-types",
-    "test": "jest"
+    "start": "yarn build && node --experimental-strip-types --import ./src/cmd/tracer/setup.ts",
+    "test": "yarn start ./node_modules/.bin/jest"
   },
   "peerDependencies": {
     "typescript": "^5"

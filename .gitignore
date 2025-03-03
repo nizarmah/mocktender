@@ -15,5 +15,15 @@
 !tsconfig.json
 
 !src
+!src/cmd
+!src/cmd/tracer
+!src/cmd/tracer/testdata
+!src/pkg
+!src/pkg/instrumentation
+!src/pkg/monkeypatch
+!src/pkg/typescript
 
 !**/*.ts
+
+!**/*.input
+!**/*.output
