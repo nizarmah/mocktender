@@ -3,12 +3,18 @@ import {
   isArrowFunction,
   isExpression,
   isFunctionDeclaration,
+  isIdentifier,
+  isObjectBindingPattern,
+  isOmittedExpression,
   isVariableStatement,
   SyntaxKind
 } from "typescript"
 import type {
   ArrowFunction,
+  BindingName,
+  BindingPattern,
   Block,
+  Expression,
   FunctionDeclaration,
   Identifier,
   Modifier,
@@ -31,8 +37,6 @@ export const instrument = (
   sourceFile: SourceFile
 ): SourceFile => {
   const statements = [
-    // Import instrumentation library.
-    ...importInstrumentationLib(),
     // Try to wrap each statement.
     ...maybeWrapStatements(sourceFile.statements),
   ]
@@ -40,43 +44,6 @@ export const instrument = (
   return factory.updateSourceFile(
     sourceFile,
     statements,
-  )
-}
-
-// Imports the instrumentation library.
-function * importInstrumentationLib () {
-  // import { __ts, __ta, __tg } from "./src/pkg/instrumentation/lib.ts"
-  yield factory.createImportDeclaration(
-    undefined,
-    factory.createImportClause(
-      false,
-      undefined,
-      factory.createNamedImports([
-        factory.createImportSpecifier(
-          false,
-          undefined,
-          traceSyncFunction,
-        ),
-        factory.createImportSpecifier(
-          false,
-          undefined,
-          traceAsyncFunction,
-        ),
-        factory.createImportSpecifier(
-          false,
-          undefined,
-          traceSyncGenerator,
-        ),
-        factory.createImportSpecifier(
-          false,
-          undefined,
-          traceAsyncGenerator,
-        ),
-      ]),
-    ),
-    // TODO: Fix relative import.
-    factory.createStringLiteral("../../pkg/instrumentation/lib.ts"),
-    undefined,
   )
 }
 
@@ -148,7 +115,12 @@ function maybeWrapVariableDeclaration (
       node.name,
       node.exclamationToken,
       node.type,
-      wrapArrowFunction(node.name.getText(), initializer)
+      wrapArrowFunction(
+        isIdentifier(node.name)
+          ? node.name.text
+          : '',
+        initializer
+      )
     )
   }
 
@@ -160,7 +132,8 @@ function wrapFunctionDeclaration (
   node: FunctionDeclaration
 ): FunctionDeclaration {
   // Get the function name.
-  const name = getFunctionDeclarationName(node)
+  const name = node.name?.text
+  // TODO: Support anonymous functions.
   if (!name) {
     return node
   }
@@ -221,6 +194,7 @@ function wrapArrowFunction (
   name: string,
   node: ArrowFunction
 ): ArrowFunction {
+  // TODO: Support anonymous functions.
   if (!name) {
     return node
   }
@@ -278,13 +252,6 @@ function wrapArrowFunction (
   )
 
   return wrapped
-}
-
-// Gets the function name from a function declaration.
-function getFunctionDeclarationName (
-  node: FunctionDeclaration
-): string {
-  return node.name?.text ?? ''
 }
 
 // Excludes the export modifier, used by wrapped functions.
@@ -385,12 +352,70 @@ function createFunctionInvokerExpression (
       identifier,
       factory.createThis(),
       factory.createArrayLiteralExpression(
-        parameters?.map((param) =>
-          factory.createIdentifier(param.name.getText())),
+        parameters?.map((param) => createBindingNameExpression(param.name)),
         true
       )
     ]
   )
 
   return callExpression
+}
+
+// Creates an expression from a parameter, that's used when invoking a function.
+function createBindingNameExpression (
+  node: BindingName
+): Expression {
+  // If the parameter is an identifier, return it.
+  // eg. `function test(a: number) { ... }` -> `a`
+  if (isIdentifier(node)) {
+    return node
+  }
+
+  // Otherwise, it's a binding pattern.
+  // eg. `function test({ a: name, b }: { a: number, b: string }) { ... }` -> `{ a: name, b }`
+  // eg. `function test([a, b]: [number, string]) { ... }` -> `[a, b]`
+  return createBindingPatternExpression(node)
+}
+
+// Creates an expression from a binding pattern, to reference each element when invoking a function.
+function createBindingPatternExpression (
+  bindingPattern: BindingPattern
+): Expression {
+  // eg. `function test({ a: name, b }: { a: number, b: string }) { ... }` -> `{ a: name, b }`
+  if (isObjectBindingPattern(bindingPattern)) {
+    return factory.createObjectLiteralExpression(
+      bindingPattern.elements.map((elem) => {
+        // eg. { a }
+        if (elem.propertyName === undefined) {
+          return factory.createShorthandPropertyAssignment(
+            // If there's no property name, there's no binding element
+            // A binding element is { a: { b, c } } or { a: [b, c] }
+            // So, we can safely cast to Identifier here.
+            elem.name as Identifier,
+            undefined
+          )
+        }
+
+        // eg. { a: name }
+        return factory.createPropertyAssignment(
+          elem.propertyName,
+          createBindingNameExpression(elem.name)
+        )
+      })
+    )
+  }
+
+  // eg. `function test([a, b]: [number, string]) { ... }` -> `[a, b]`
+  return factory.createArrayLiteralExpression(
+    bindingPattern.elements.map((elem) => {
+      // If an element is omitted, we return it because order is important.
+      // We cannot skip any element, otherwise we reference the wrong parameter.
+      if (isOmittedExpression(elem)) {
+        return factory.createOmittedExpression()
+      }
+
+      // Otherwise, it's a binding name.
+      return createBindingNameExpression(elem.name)
+    })
+  )
 }

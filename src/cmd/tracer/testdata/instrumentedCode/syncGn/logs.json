@@ -1,0 +1,92 @@
+[
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.init",
+      "data": "{\n  \"args\": [\n    10\n  ]\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 0,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 1,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 1,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 2,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 3,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 5,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 8,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 13,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 21,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 34,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 55,\n  \"done\": false\n}"
+    }
+  ],
+  [
+    {
+      "msg": "sync.gen.fibonacciGenerator.next.return",
+      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": undefined,\n  \"done\": true\n}"
+    }
+  ],
+  [
+    {
+      "msg": "syncGn.main.fibonacciGenerator.done",
+      "result": "0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55"
+    }
+  ],
+  [
+    {
+      "msg": "sync.func.main.return",
+      "data": "{\n  \"args\": [],\n  \"result\": undefined\n}"
+    }
+  ]
+]

@@ -19,11 +19,5 @@ Serves mocks.
 3. Run tests.
 
     ```bash
-    yarn test
+    yarn dev
     ```
-
-4. Run the tracer.
-
-```bash
-
-```

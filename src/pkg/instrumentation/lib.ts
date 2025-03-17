@@ -1,3 +1,18 @@
+import serialize from "serialize-javascript"
+
+export type SyncFn = (...args: unknown[]) => unknown
+export type AsyncFn = (...args: unknown[]) => Promise<unknown>
+export type SyncGn = (...args: unknown[]) => IterableIterator<unknown>
+export type AsyncGn = (...args: unknown[]) => AsyncIterableIterator<unknown>
+
+export type TracerFn<
+  FunctionType extends
+    | SyncFn
+    | AsyncFn
+    | SyncGn
+    | AsyncGn
+> = (name: string, fn: FunctionType, self: unknown, args: unknown[]) => unknown
+
 /**
  * Trace calls for a **sync** function.
  *
@@ -26,32 +41,20 @@
  * ```
  *
  * @param fnName - Display name of the function being traced
- * @param originalFn - The original synchronous function
+ * @param ogFn - The original synchronous function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns The original function's return value
  */
-export function __tsf(
-  fnName: string,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  originalFn: Function,
-  self: unknown,
-  args: unknown[]
-) {
+export const __tsf: TracerFn<SyncFn> = (fnName, ogFn, self, args) => {
   try {
-    const result = originalFn.apply(self, args)
+    const result = ogFn.apply(self, args)
 
-    __l(`sync.func.${fnName}.return`, {
-      args: __s(args),
-      result: __s(result),
-    })
+    __l(`sync.func.${fnName}.return`, { args, result })
 
     return result
   } catch (err) {
-    __l(`sync.func.${fnName}.error`, {
-      args: __s(args),
-      err: __s(err),
-    })
+    __l(`sync.func.${fnName}.error`, { args, err })
 
     throw err
   }
@@ -86,32 +89,20 @@ export function __tsf(
  * ```
  *
  * @param fnName - Display name of the async function being traced
- * @param originalFn - The original async function
+ * @param ogFn - The original async function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns A promise that resolves or rejects exactly like the original async function
  */
-export async function __taf(
-  fnName: string,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  originalFn: Function,
-  self: unknown,
-  args: unknown[]
-) {
+export const __taf: TracerFn<AsyncFn> = async (fnName, ogFn, self, args) => {
   try {
-    const result = await originalFn.apply(self, args)
+    const result = await ogFn.apply(self, args)
 
-    __l(`async.func.${fnName}.return`, {
-      args: __s(args),
-      result: __s(result),
-    })
+    __l(`async.func.${fnName}.return`, { args, result })
 
     return result
   } catch (err) {
-    __l(`async.func.${fnName}.error`, {
-      args: __s(args),
-      err: __s(err),
-    })
+    __l(`async.func.${fnName}.error`, { args, err })
 
     throw err
   }
@@ -148,30 +139,19 @@ export async function __taf(
  * ```
  *
  * @param fnName - Display name of the generator function being traced
- * @param originalGen - The original generator function
+ * @param ogFn - The original generator function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns An iterator (IterableIterator) that wraps the original generator’s iteration
  */
-export function __tsg(
-  fnName: string,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  originalGen: Function,
-  self: unknown,
-  args: unknown[]
-) {
-  __l(`sync.gen.${fnName}.init`, {
-    args: __s(args),
-  })
+export const __tsg: TracerFn<SyncGn> = (fnName, ogFn, self, args) => {
+  __l(`sync.gen.${fnName}.init`, { args })
 
   let iterator
   try {
-    iterator = originalGen.apply(self, args)
+    iterator = ogFn.apply(self, args)
   } catch (err) {
-    __l(`sync.gen.${fnName}.error`, {
-      args: __s(args),
-      err: __s(err),
-    })
+    __l(`sync.gen.${fnName}.error`, { args, err })
 
     throw err
   }
@@ -210,30 +190,19 @@ export function __tsg(
  * ```
  *
  * @param fnName - Display name of the async generator function being traced
- * @param originalGen - The original async generator function
+ * @param ogFn - The original async generator function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns An async iterator (AsyncIterableIterator) that wraps the original async generator’s iteration
  */
-export function __tag(
-  fnName: string,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  originalGen: Function,
-  self: unknown,
-  args: unknown[]
-) {
-  __l(`async.gen.${fnName}.init`, {
-    args: __s(args),
-  })
+export const __tag: TracerFn<AsyncGn> = (fnName, ogFn, self, args) => {
+  __l(`async.gen.${fnName}.init`, { args })
 
   let asyncIterator
   try {
-    asyncIterator = originalGen.apply(self, args)
+    asyncIterator = ogFn.apply(self, args)
   } catch (err) {
-    __l(`async.gen.${fnName}.error`, {
-      args: __s(args),
-      err: __s(err),
-    })
+    __l(`async.gen.${fnName}.error`, { args, err })
 
     throw err
   }
@@ -250,8 +219,8 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
 
         __l(`sync.gen.${fnName}.next.return`, {
           context: 'next',
-          args: __s(input),
-          value: __s(out?.value),
+          args: input,
+          value: out?.value,
           done: out?.done,
         })
 
@@ -259,8 +228,8 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
       } catch (err) {
         __l(`sync.gen.${fnName}.next.error`, {
           context: 'next',
-          args: __s(input),
-          err: __s(err),
+          args: input,
+          err,
         })
 
         throw err
@@ -272,17 +241,17 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
 
         __l(`sync.gen.${fnName}.throw.return`, {
           context: 'throw',
-          args: __s(input),
-          value: __s(out?.value),
+          args: input,
+          value: out?.value,
           done: out?.done,
         })
 
-        return out!
+        return out as IteratorResult<unknown, unknown>
       } catch (err) {
         __l(`sync.gen.${fnName}.throw.error`, {
           context: 'throw',
-          args: __s(input),
-          err: __s(err),
+          args: input,
+          err,
         })
 
         throw err
@@ -294,17 +263,17 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
 
         __l(`sync.gen.${fnName}.return.return`, {
           context: 'return',
-          args: __s(input),
-          value: __s(out?.value),
+          args: input,
+          value: out?.value,
           done: out?.done,
         })
 
-        return out!
+        return out as IteratorResult<unknown, unknown>
       } catch (err) {
         __l(`sync.gen.${fnName}.return.error`, {
           context: 'return',
-          args: __s(input),
-          err: __s(err),
+          args: input,
+          err,
         })
 
         throw err
@@ -326,8 +295,8 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
 
         __l(`async.gen.${fnName}.next.return`, {
           context: 'next',
-          args: __s(input),
-          value: __s(out?.value),
+          args: input,
+          value: out?.value,
           done: out?.done,
         })
 
@@ -335,8 +304,8 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
       } catch (err) {
         __l(`async.gen.${fnName}.next.error`, {
           context: 'next',
-          args: __s(input),
-          err: __s(err),
+          args: input,
+          err: err,
         })
 
         throw err
@@ -348,17 +317,17 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
 
         __l(`async.gen.${fnName}.throw.return`, {
           context: 'throw',
-          args: __s(input),
-          value: __s(out?.value),
+          args: input,
+          value: out?.value,
           done: out?.done,
         })
 
-        return out!
+        return out as IteratorResult<unknown, unknown>
       } catch (err) {
         __l(`async.gen.${fnName}.throw.error`, {
           context: 'throw',
-          args: __s(input),
-          err: __s(err),
+          args: input,
+          err,
         })
 
         throw err
@@ -370,17 +339,17 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
 
         __l(`async.gen.${fnName}.return.return`, {
           context: 'return',
-          args: __s(input),
-          value: __s(out?.value),
+          args: input,
+          value: out?.value,
           done: out?.done,
         })
 
-        return out!
+        return out as IteratorResult<unknown, unknown>
       } catch (err) {
         __l(`async.gen.${fnName}.return.error`, {
           context: 'return',
-          args: __s(input),
-          err: __s(err),
+          args: input,
+          err,
         })
 
         throw err
@@ -393,13 +362,15 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
 }
 
 // Log a message.
-const __l = (...args: unknown[]) => {
-  console.log(...args)
+const __l = (msg: string, data: Record<string, unknown>) => {
+  console.log({
+    msg,
+    data: __s(data),
+  })
 }
 
 // Serialize a value to a string.
-const __s = (v: unknown): unknown => {
-  // TODO: Figure out how to serialize objects, without circular references.
-  // We also need to re-use the object in mock test behavior.
-  return v
+const __s = (v: unknown): string => {
+  // TODO: Handle circular references, check `createSourceFile`.
+  return serialize(v, { space: 2 })
 }

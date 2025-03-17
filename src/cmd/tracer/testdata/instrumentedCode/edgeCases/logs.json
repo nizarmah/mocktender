@@ -1,0 +1,35 @@
+[
+  [
+    {
+      "msg": "sync.func.createGreeting.return",
+      "data": "{\n  \"args\": [\n    {\n      \"greeter\": \"John\",\n      \"greeted\": \"world\",\n      \"weather\": \"sunny\"\n    }\n  ],\n  \"result\": \"Hello, world. I am John. Is the weather sunny today?\"\n}"
+    }
+  ],
+  [
+    {
+      "msg": "edgeCases.main.createGreeting.done",
+      "result": "Hello, world. I am John. Is the weather sunny today?"
+    }
+  ],
+  [
+    {
+      "msg": "sync.func.swap.return",
+      "data": "{\n  \"args\": [\n    [\n      \"Hello\",\n      \"world\"\n    ]\n  ],\n  \"result\": [\n    \"world\",\n    \"Hello\"\n  ]\n}"
+    }
+  ],
+  [
+    {
+      "msg": "edgeCases.main.swap.done",
+      "result": [
+        "world",
+        "Hello"
+      ]
+    }
+  ],
+  [
+    {
+      "msg": "sync.func.main.return",
+      "data": "{\n  \"args\": [],\n  \"result\": undefined\n}"
+    }
+  ]
+]

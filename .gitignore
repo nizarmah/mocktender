@@ -15,15 +15,19 @@
 !tsconfig.json
 
 !src
+
 !src/cmd
 !src/cmd/tracer
 !src/cmd/tracer/testdata
+!src/cmd/tracer/testdata/instrumentedCode
+!src/cmd/tracer/testdata/instrumentedCode/*
+!src/cmd/tracer/testdata/instrumentedCode/*/input.ts
+!src/cmd/tracer/testdata/instrumentedCode/*/output.js
+!src/cmd/tracer/testdata/instrumentedCode/*/logs.json
+
 !src/pkg
 !src/pkg/instrumentation
 !src/pkg/monkeypatch
 !src/pkg/typescript
 
 !**/*.ts
-
-!**/*.input
-!**/*.output
