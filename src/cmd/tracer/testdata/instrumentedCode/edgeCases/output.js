@@ -31,20 +31,24 @@ function swap([a, b]: [
         [a, b]
     ]);
 }
-export function main() {
-    function main() {
-        console.log({
-            msg: "edgeCases.main.createGreeting.done",
-            result: createGreeting({
-                greeter: "John",
-                greeted: "world",
-                weather: "sunny",
-            }),
+export function main(): [
+    string,
+    string
+] {
+    function main(): [
+        string,
+        string
+    ] {
+        const greetingResult = createGreeting({
+            greeter: "John",
+            greeted: "world",
+            weather: "sunny",
         });
-        console.log({
-            msg: "edgeCases.main.swap.done",
-            result: swap(["Hello", "world"]),
-        });
+        const swapResult = swap(["Hello", "world"]).join(", ");
+        return [
+            greetingResult,
+            swapResult,
+        ];
     }
     return __tsf(main, __filename, this, []);
 }

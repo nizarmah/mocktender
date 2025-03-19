@@ -19,7 +19,14 @@ export default [
   {
     rules: {
       // No semicolons.
-      semi: ["error", "never"]
+      semi: ["error", "never"],
+
+      // No unused vars (except `^_`)
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": ["error", {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+      }],
     },
   }
 ]

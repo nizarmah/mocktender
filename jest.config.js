@@ -7,7 +7,8 @@ const config = {
   cache: false,
 
   // Jest setup, mainly for globals.
-  setupFiles: [
+  // AfterEnv because we use Jest globals.
+  setupFilesAfterEnv: [
     // Add tracing globals.
     "<rootDir>/src/cmd/tracer/globals.ts",
   ],

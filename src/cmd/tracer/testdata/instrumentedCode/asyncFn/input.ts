@@ -1,26 +1,21 @@
 
-const createResolver = (ms: number, val: unknown) =>
-  (resolve: (v: unknown) => void) => setTimeout(() => resolve(val), ms)
+const createResolver = <T>(ms: number, val: T) =>
+  (resolve: (v: T) => void) => setTimeout(() => resolve(val), ms)
 
-const sleep = (ms: number, val: unknown) =>
+const sleep = <T>(ms: number, val: T): Promise<T> =>
   new Promise(createResolver(ms, val))
 
-async function resolveFn(ms: number, val: number) {
+async function resolveFn(ms: number, val: number): Promise<number> {
   return sleep(ms, val)
 }
 
-const resolveArrow = async (ms: number, val: string) => {
+const resolveArrow = async (ms: number, val: string): Promise<string> => {
   return sleep(ms, val)
 }
 
-export async function main() {
-  console.log({
-    msg: "asyncFn.main.firstPromise.resolved",
-    result: await resolveFn(1000, 123)
-  })
-
-  console.log({
-    msg: "asyncFn.main.secondPromise.resolved",
-    result: await resolveArrow(1000, "456")
-  })
+export async function main(): Promise<[number, string]> {
+  return [
+    await resolveFn(1000, 123),
+    await resolveArrow(1000, "456"),
+  ]
 }

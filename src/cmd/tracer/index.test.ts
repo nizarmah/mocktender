@@ -10,6 +10,12 @@ type TestCase = {
   logs: string
 }
 
+type Log = {
+  msg: string
+  rid: string
+  time: number
+  data: Record<string, unknown>
+}
 
 const tt: TestCase[] = [
   {
@@ -39,8 +45,8 @@ const tt: TestCase[] = [
 ]
 
 describe("tracer", () => {
-  const logQueue: string[][] = []
-  const mockLog = (...args: string[]) => logQueue.push(args)
+  const logQueue: Log[] = []
+  const mockLog = (log: Log) => logQueue.push(log)
 
   beforeEach(() => {
     logQueue.length = 0
@@ -61,9 +67,19 @@ describe("tracer", () => {
       const { main } = await import(path.join(process.cwd(), tc.in))
       await main()
 
-      const want = JSON.parse(readFileSync(tc.logs, "utf-8"))
+      const logCache: Log[] = JSON.parse(readFileSync(tc.logs, "utf-8"))
 
-      expect(logQueue).toStrictEqual(want)
+      expect(logQueue.length).toStrictEqual(logCache.length)
+
+      logQueue.forEach((log, i) => {
+        const { rid: gotRID, time: gotTime, ...got } = log
+        const { rid: _rid, time: _time, ...want } = logCache[i]
+
+        expect(gotRID).toStrictEqual(global.__rid)
+        expect(gotTime).toStrictEqual(expect.any(Number))
+
+        expect(got).toStrictEqual(want)
+      })
     })
   })
 

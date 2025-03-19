@@ -16,10 +16,7 @@ function* fibonacciGenerator(n: number): IterableIterator<number> {
 export function main() {
     function main() {
         const gen = fibonacciGenerator(10);
-        console.log({
-            msg: "syncGn.main.fibonacciGenerator.done",
-            result: Array.from(gen).join(", "),
-        });
+        return Array.from(gen);
     }
     return __tsf(main, __filename, this, []);
 }

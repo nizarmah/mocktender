@@ -25,11 +25,6 @@ const fibonacciSequence = (n: number): number[] => {
   return mem
 }
 
-export function main() {
-  const sequence = fibonacciSequence(10)
-
-  console.log({
-    msg: "syncFn.main.fibonacciSequence.done",
-    result: sequence.join(", "),
-  })
+export function main(): number[] {
+  return fibonacciSequence(10)
 }

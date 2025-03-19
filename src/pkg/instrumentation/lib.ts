@@ -398,6 +398,8 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
 const __l = (msg: string, data: Record<string, unknown>) => {
   console.log({
     msg,
+    rid: global.__rid,
+    time: Date.now(),
     data: __s(data),
   })
 }

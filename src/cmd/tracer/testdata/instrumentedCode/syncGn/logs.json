@@ -1,92 +1,86 @@
 [
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.init",
-      "data": "{\n  \"name\": \"fibonacciGenerator\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FsyncGn\\u002Finput.ts\",\n  \"args\": [\n    10\n  ]\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 0,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 1,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 1,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 2,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 3,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 5,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 8,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 13,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 21,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 34,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 55,\n  \"done\": false\n}"
-    }
-  ],
-  [
-    {
-      "msg": "sync.gen.fibonacciGenerator.next.return",
-      "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": undefined,\n  \"done\": true\n}"
-    }
-  ],
-  [
-    {
-      "msg": "syncGn.main.fibonacciGenerator.done",
-      "result": "0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55"
-    }
-  ],
-  [
-    {
-      "msg": "sync.func.main.return",
-      "data": "{\n  \"name\": \"main\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FsyncGn\\u002Finput.ts\",\n  \"args\": [],\n  \"result\": undefined\n}"
-    }
-  ]
+  {
+    "msg": "sync.gen.fibonacciGenerator.init",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"name\": \"fibonacciGenerator\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FsyncGn\\u002Finput.ts\",\n  \"args\": [\n    10\n  ]\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 0,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 1,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 1,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 2,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 3,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 5,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 8,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 13,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 21,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 34,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": 55,\n  \"done\": false\n}"
+  },
+  {
+    "msg": "sync.gen.fibonacciGenerator.next.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"context\": \"next\",\n  \"args\": undefined,\n  \"value\": undefined,\n  \"done\": true\n}"
+  },
+  {
+    "msg": "sync.func.main.return",
+    "rid": "fbb8dc6a-91c2-471a-b337-56360253e7f3",
+    "time": 1742407833001,
+    "data": "{\n  \"name\": \"main\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FsyncGn\\u002Finput.ts\",\n  \"args\": [],\n  \"result\": [\n    0,\n    1,\n    1,\n    2,\n    3,\n    5,\n    8,\n    13,\n    21,\n    34,\n    55\n  ]\n}"
+  }
 ]

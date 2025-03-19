@@ -27,13 +27,9 @@ const fibonacciSequence = (n: number): number[] => {
         n
     ]);
 };
-export function main() {
-    function main() {
-        const sequence = fibonacciSequence(10);
-        console.log({
-            msg: "syncFn.main.fibonacciSequence.done",
-            result: sequence.join(", "),
-        });
+export function main(): number[] {
+    function main(): number[] {
+        return fibonacciSequence(10);
     }
     return __tsf(main, __filename, this, []);
 }
