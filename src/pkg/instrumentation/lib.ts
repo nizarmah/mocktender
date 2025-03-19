@@ -11,7 +11,7 @@ export type TracerFn<
     | AsyncFn
     | SyncGn
     | AsyncGn
-> = (name: string, fn: FunctionType, self: unknown, args: unknown[]) => unknown
+> = (fn: FunctionType, dir: string, self: unknown, args: unknown[]) => unknown
 
 /**
  * Trace calls for a **sync** function.
@@ -25,36 +25,41 @@ export type TracerFn<
  *
  * // Traced code:
  * function test(a: number, b: number) {
- *   // Original function body::
- *   function __fn(a: number, b: number) {
- *     return a + b;
- *   }
- *
- *   // Then we call __tsf with:
  *   return __tsf(
- *     "test",      // function name
- *     __fn,        // reference to the original code
+ *     function test(a: number, b: number) {
+ *       return a + b;
+ *     },           // reference to the original code
  *     this,        // 'this' context (important for class methods)
  *     [a, b],      // arguments as an array
  *   );
  * }
  * ```
  *
- * @param fnName - Display name of the function being traced
- * @param ogFn - The original synchronous function
+ * @param fn - The original synchronous function
+ * @param dir - The directory of the file containing the original function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns The original function's return value
  */
-export const __tsf: TracerFn<SyncFn> = (fnName, ogFn, self, args) => {
+export const __tsf: TracerFn<SyncFn> = (fn, dir, self, args) => {
   try {
-    const result = ogFn.apply(self, args)
+    const result = fn.apply(self, args)
 
-    __l(`sync.func.${fnName}.return`, { args, result })
+    __l(`sync.func.${fn.name}.return`, {
+      name: fn.name,
+      path: dir,
+      args,
+      result,
+    })
 
     return result
   } catch (err) {
-    __l(`sync.func.${fnName}.error`, { args, err })
+    __l(`sync.func.${fn.name}.error`, {
+      name: fn.name,
+      path: dir,
+      args,
+      err
+    })
 
     throw err
   }
@@ -88,21 +93,31 @@ export const __tsf: TracerFn<SyncFn> = (fnName, ogFn, self, args) => {
  * }
  * ```
  *
- * @param fnName - Display name of the async function being traced
- * @param ogFn - The original async function
+ * @param fn - The original async function
+ * @param dir - The directory of the file containing the original function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns A promise that resolves or rejects exactly like the original async function
  */
-export const __taf: TracerFn<AsyncFn> = async (fnName, ogFn, self, args) => {
+export const __taf: TracerFn<AsyncFn> = async (fn, dir, self, args) => {
   try {
-    const result = await ogFn.apply(self, args)
+    const result = await fn.apply(self, args)
 
-    __l(`async.func.${fnName}.return`, { args, result })
+    __l(`async.func.${fn.name}.return`, {
+      name: fn.name,
+      path: dir,
+      args,
+      result,
+    })
 
     return result
   } catch (err) {
-    __l(`async.func.${fnName}.error`, { args, err })
+    __l(`async.func.${fn.name}.error`, {
+      name: fn.name,
+      path: dir,
+      args,
+      err,
+    })
 
     throw err
   }
@@ -138,25 +153,34 @@ export const __taf: TracerFn<AsyncFn> = async (fnName, ogFn, self, args) => {
  * }
  * ```
  *
- * @param fnName - Display name of the generator function being traced
- * @param ogFn - The original generator function
+ * @param fn - The original generator function
+ * @param dir - The directory of the file containing the original function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns An iterator (IterableIterator) that wraps the original generator’s iteration
  */
-export const __tsg: TracerFn<SyncGn> = (fnName, ogFn, self, args) => {
-  __l(`sync.gen.${fnName}.init`, { args })
+export const __tsg: TracerFn<SyncGn> = (fn, dir, self, args) => {
+  __l(`sync.gen.${fn.name}.init`, {
+    name: fn.name,
+    path: dir,
+    args,
+  })
 
   let iterator
   try {
-    iterator = ogFn.apply(self, args)
+    iterator = fn.apply(self, args)
   } catch (err) {
-    __l(`sync.gen.${fnName}.error`, { args, err })
+    __l(`sync.gen.${fn.name}.error`, {
+      name: fn.name,
+      path: dir,
+      args,
+      err,
+    })
 
     throw err
   }
 
-  return __wsi(fnName, iterator)
+  return __wsi(fn.name, iterator)
 }
 
 /**
@@ -189,25 +213,34 @@ export const __tsg: TracerFn<SyncGn> = (fnName, ogFn, self, args) => {
  * }
  * ```
  *
- * @param fnName - Display name of the async generator function being traced
- * @param ogFn - The original async generator function
+ * @param fn - The original async generator function
+ * @param dir - The directory of the file containing the original function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns An async iterator (AsyncIterableIterator) that wraps the original async generator’s iteration
  */
-export const __tag: TracerFn<AsyncGn> = (fnName, ogFn, self, args) => {
-  __l(`async.gen.${fnName}.init`, { args })
+export const __tag: TracerFn<AsyncGn> = (fn, dir, self, args) => {
+  __l(`async.gen.${fn.name}.init`, {
+    name: fn.name,
+    path: dir,
+    args,
+  })
 
   let asyncIterator
   try {
-    asyncIterator = ogFn.apply(self, args)
+    asyncIterator = fn.apply(self, args)
   } catch (err) {
-    __l(`async.gen.${fnName}.error`, { args, err })
+    __l(`async.gen.${fn.name}.error`, {
+      name: fn.name,
+      path: dir,
+      args,
+      err,
+    })
 
     throw err
   }
 
-  return __wai(fnName, asyncIterator)
+  return __wai(fn.name, asyncIterator)
 }
 
 // Wraps a **sync** iterator so that .next(), .throw(), .return() all get logged.

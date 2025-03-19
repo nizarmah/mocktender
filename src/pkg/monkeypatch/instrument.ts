@@ -17,7 +17,6 @@ import type {
   Expression,
   FunctionDeclaration,
   Identifier,
-  Modifier,
   ModifierLike,
   NodeArray,
   ParameterDeclaration,
@@ -116,9 +115,7 @@ function maybeWrapVariableDeclaration (
       node.exclamationToken,
       node.type,
       wrapArrowFunction(
-        isIdentifier(node.name)
-          ? node.name.text
-          : '',
+        node,
         initializer
       )
     )
@@ -131,10 +128,8 @@ function maybeWrapVariableDeclaration (
 function wrapFunctionDeclaration (
   node: FunctionDeclaration
 ): FunctionDeclaration {
-  // Get the function name.
-  const name = node.name?.text
-  // TODO: Support anonymous functions.
-  if (!name) {
+  // Ignore anonymous functions.
+  if (!node.name?.text) {
     return node
   }
 
@@ -147,12 +142,12 @@ function wrapFunctionDeclaration (
   const isAsync = hasAsyncModifier(node.modifiers)
   const isGenerator = node.asteriskToken !== undefined
 
-  // Create inner function.
-  const innerFnName = factory.createIdentifier("__fn")
   const innerFn = factory.createFunctionDeclaration(
-    excludeExportModifier(node.modifiers),
+    node.modifiers?.filter((modifier) => {
+      return modifier.kind !== SyntaxKind.ExportKeyword
+    }),
     node.asteriskToken,
-    innerFnName,
+    node.name,
     node.typeParameters,
     node.parameters,
     node.type,
@@ -161,8 +156,7 @@ function wrapFunctionDeclaration (
 
   // Create inner function invoker.
   const invoker = createInvokerStatement(
-    name,
-    innerFnName,
+    node.name,
     node.parameters,
     isAsync,
     isGenerator
@@ -181,7 +175,7 @@ function wrapFunctionDeclaration (
       node.body,
       [
         innerFn,
-        invoker,
+        invoker
       ]
     )
   )
@@ -191,11 +185,14 @@ function wrapFunctionDeclaration (
 
 // Wraps an arrow function.
 function wrapArrowFunction (
-  name: string,
+  declaration: VariableDeclaration,
   node: ArrowFunction
 ): ArrowFunction {
-  // TODO: Support anonymous functions.
-  if (!name) {
+  // Ignore anonymous functions and bindings.
+  if (
+    !isIdentifier(declaration.name) ||
+    !declaration.name.text
+  ) {
     return node
   }
 
@@ -214,11 +211,10 @@ function wrapArrowFunction (
   const isAsync = hasAsyncModifier(node.modifiers)
 
   // Create inner function.
-  const innerFnName = factory.createIdentifier("__fn")
   const innerFn = factory.createFunctionDeclaration(
-    excludeExportModifier(node.modifiers),
-    undefined,
-    innerFnName,
+    node.modifiers,
+    node.asteriskToken,
+    declaration.name,
     node.typeParameters,
     node.parameters,
     node.type,
@@ -227,8 +223,7 @@ function wrapArrowFunction (
 
   // Create inner function invoker.
   const invoker = createInvokerStatement(
-    name,
-    innerFnName,
+    declaration.name,
     node.parameters,
     isAsync,
     false
@@ -254,21 +249,6 @@ function wrapArrowFunction (
   return wrapped
 }
 
-// Excludes the export modifier, used by wrapped functions.
-function excludeExportModifier<T extends ModifierLike | Modifier> (
-  modifiers: NodeArray<T> | undefined
-): NodeArray<T> | undefined {
-  if (modifiers === undefined) {
-    return undefined
-  }
-
-  return factory.createNodeArray(
-    modifiers.filter((modifier) => {
-      return modifier.kind !== SyntaxKind.ExportKeyword
-    })
-  )
-}
-
 // Checks if a node has an async modifier.
 function hasAsyncModifier (
   modifiers: NodeArray<ModifierLike> | undefined
@@ -281,30 +261,27 @@ function hasAsyncModifier (
 }
 
 function createInvokerStatement (
-  name: string,
-  identifier: Identifier,
+  fnName: Identifier,
   parameters: NodeArray<ParameterDeclaration> | undefined,
   isAsync: boolean,
   isGenerator: boolean
 ) {
   if (isGenerator) {
-    return createGeneratorInvokerStatement(name, identifier, parameters, isAsync)
+    return createGeneratorInvokerStatement(fnName, parameters, isAsync)
   }
 
-  return createFunctionInvokerStatement(name, identifier, parameters, isAsync)
+  return createFunctionInvokerStatement(fnName, parameters, isAsync)
 }
 
 // Creates a non-generator function invoker statement.
 function createFunctionInvokerStatement (
-  name: string,
-  identifier: Identifier,
+  fnName: Identifier,
   parameters: NodeArray<ParameterDeclaration> | undefined,
   isAsync: boolean
 ) {
   const invoker = createFunctionInvokerExpression(
     isAsync ? traceAsyncFunction : traceSyncFunction,
-    name,
-    identifier,
+    fnName,
     parameters
   )
 
@@ -317,15 +294,13 @@ function createFunctionInvokerStatement (
 
 // Creates a generator function invoker statement.
 function createGeneratorInvokerStatement (
-  name: string,
-  identifier: Identifier,
+  fnName: Identifier,
   parameters: NodeArray<ParameterDeclaration> | undefined,
   isAsync: boolean
 ) {
   const invoker = createFunctionInvokerExpression(
     isAsync ? traceAsyncGenerator : traceSyncGenerator,
-    name,
-    identifier,
+    fnName,
     parameters
   )
 
@@ -340,16 +315,15 @@ function createGeneratorInvokerStatement (
 // Creates a function invoker expression, with await if needed.
 function createFunctionInvokerExpression (
   tracer: Identifier,
-  name: string,
-  identifier: Identifier,
+  fnName: Identifier,
   parameters: NodeArray<ParameterDeclaration> | undefined
 ) {
   const callExpression = factory.createCallExpression(
     tracer,
     undefined,
     [
-      factory.createStringLiteral(name),
-      identifier,
+      fnName,
+      factory.createIdentifier("__filename"),
       factory.createThis(),
       factory.createArrayLiteralExpression(
         parameters?.map((param) => createBindingNameExpression(param.name)),

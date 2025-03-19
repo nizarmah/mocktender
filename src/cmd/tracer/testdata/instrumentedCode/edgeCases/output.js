@@ -4,10 +4,10 @@ type Greeting = {
     weather: string;
 };
 function createGreeting({ greeter: name, greeted, weather }: Greeting): string {
-    function __fn({ greeter: name, greeted, weather }: Greeting): string {
+    function createGreeting({ greeter: name, greeted, weather }: Greeting): string {
         return `Hello, ${greeted}. I am ${name}. Is the weather ${weather} today?`;
     }
-    return __tsf("createGreeting", __fn, this, [
+    return __tsf(createGreeting, __filename, this, [
         { greeter: name, greeted, weather }
     ]);
 }
@@ -18,7 +18,7 @@ function swap([a, b]: [
     string,
     string
 ] {
-    function __fn([a, b]: [
+    function swap([a, b]: [
         string,
         string
     ]): [
@@ -27,12 +27,12 @@ function swap([a, b]: [
     ] {
         return [b, a];
     }
-    return __tsf("swap", __fn, this, [
+    return __tsf(swap, __filename, this, [
         [a, b]
     ]);
 }
 export function main() {
-    function __fn() {
+    function main() {
         console.log({
             msg: "edgeCases.main.createGreeting.done",
             result: createGreeting({
@@ -46,5 +46,5 @@ export function main() {
             result: swap(["Hello", "world"]),
         });
     }
-    return __tsf("main", __fn, this, []);
+    return __tsf(main, __filename, this, []);
 }

@@ -1,5 +1,5 @@
 function* fibonacciGenerator(n: number): IterableIterator<number> {
-    function* __fn(n: number): IterableIterator<number> {
+    function* fibonacciGenerator(n: number): IterableIterator<number> {
         let a: number = 0;
         let b: number = 1;
         for (let i = 0; i <= n; i++) {
@@ -9,17 +9,17 @@ function* fibonacciGenerator(n: number): IterableIterator<number> {
             b = temp;
         }
     }
-    return yield* __tsg("fibonacciGenerator", __fn, this, [
+    return yield* __tsg(fibonacciGenerator, __filename, this, [
         n
     ]);
 }
 export function main() {
-    function __fn() {
+    function main() {
         const gen = fibonacciGenerator(10);
         console.log({
             msg: "syncGn.main.fibonacciGenerator.done",
             result: Array.from(gen).join(", "),
         });
     }
-    return __tsf("main", __fn, this, []);
+    return __tsf(main, __filename, this, []);
 }

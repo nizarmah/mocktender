@@ -2,19 +2,19 @@
   [
     {
       "msg": "sync.func.createResolver.return",
-      "data": "{\n  \"args\": [\n    1000,\n    123\n  ],\n  \"result\": resolve => setTimeout(() => resolve(val), ms)\n}"
+      "data": "{\n  \"name\": \"createResolver\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FasyncFn\\u002Finput.ts\",\n  \"args\": [\n    1000,\n    123\n  ],\n  \"result\": resolve => setTimeout(() => resolve(val), ms)\n}"
     }
   ],
   [
     {
       "msg": "sync.func.sleep.return",
-      "data": "{\n  \"args\": [\n    1000,\n    123\n  ],\n  \"result\": {}\n}"
+      "data": "{\n  \"name\": \"sleep\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FasyncFn\\u002Finput.ts\",\n  \"args\": [\n    1000,\n    123\n  ],\n  \"result\": {}\n}"
     }
   ],
   [
     {
       "msg": "async.func.resolveFn.return",
-      "data": "{\n  \"args\": [\n    1000,\n    123\n  ],\n  \"result\": 123\n}"
+      "data": "{\n  \"name\": \"resolveFn\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FasyncFn\\u002Finput.ts\",\n  \"args\": [\n    1000,\n    123\n  ],\n  \"result\": 123\n}"
     }
   ],
   [
@@ -26,19 +26,19 @@
   [
     {
       "msg": "sync.func.createResolver.return",
-      "data": "{\n  \"args\": [\n    1000,\n    \"456\"\n  ],\n  \"result\": resolve => setTimeout(() => resolve(val), ms)\n}"
+      "data": "{\n  \"name\": \"createResolver\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FasyncFn\\u002Finput.ts\",\n  \"args\": [\n    1000,\n    \"456\"\n  ],\n  \"result\": resolve => setTimeout(() => resolve(val), ms)\n}"
     }
   ],
   [
     {
       "msg": "sync.func.sleep.return",
-      "data": "{\n  \"args\": [\n    1000,\n    \"456\"\n  ],\n  \"result\": {}\n}"
+      "data": "{\n  \"name\": \"sleep\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FasyncFn\\u002Finput.ts\",\n  \"args\": [\n    1000,\n    \"456\"\n  ],\n  \"result\": {}\n}"
     }
   ],
   [
     {
       "msg": "async.func.resolveArrow.return",
-      "data": "{\n  \"args\": [\n    1000,\n    \"456\"\n  ],\n  \"result\": \"456\"\n}"
+      "data": "{\n  \"name\": \"resolveArrow\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FasyncFn\\u002Finput.ts\",\n  \"args\": [\n    1000,\n    \"456\"\n  ],\n  \"result\": \"456\"\n}"
     }
   ],
   [
@@ -50,7 +50,7 @@
   [
     {
       "msg": "async.func.main.return",
-      "data": "{\n  \"args\": [],\n  \"result\": undefined\n}"
+      "data": "{\n  \"name\": \"main\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FasyncFn\\u002Finput.ts\",\n  \"args\": [],\n  \"result\": undefined\n}"
     }
   ]
 ]

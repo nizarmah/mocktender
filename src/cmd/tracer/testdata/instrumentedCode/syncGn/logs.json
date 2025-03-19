@@ -2,7 +2,7 @@
   [
     {
       "msg": "sync.gen.fibonacciGenerator.init",
-      "data": "{\n  \"args\": [\n    10\n  ]\n}"
+      "data": "{\n  \"name\": \"fibonacciGenerator\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FsyncGn\\u002Finput.ts\",\n  \"args\": [\n    10\n  ]\n}"
     }
   ],
   [
@@ -86,7 +86,7 @@
   [
     {
       "msg": "sync.func.main.return",
-      "data": "{\n  \"args\": [],\n  \"result\": undefined\n}"
+      "data": "{\n  \"name\": \"main\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FsyncGn\\u002Finput.ts\",\n  \"args\": [],\n  \"result\": undefined\n}"
     }
   ]
 ]

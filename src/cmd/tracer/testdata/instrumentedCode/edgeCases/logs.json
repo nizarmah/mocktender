@@ -2,7 +2,7 @@
   [
     {
       "msg": "sync.func.createGreeting.return",
-      "data": "{\n  \"args\": [\n    {\n      \"greeter\": \"John\",\n      \"greeted\": \"world\",\n      \"weather\": \"sunny\"\n    }\n  ],\n  \"result\": \"Hello, world. I am John. Is the weather sunny today?\"\n}"
+      "data": "{\n  \"name\": \"createGreeting\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FedgeCases\\u002Finput.ts\",\n  \"args\": [\n    {\n      \"greeter\": \"John\",\n      \"greeted\": \"world\",\n      \"weather\": \"sunny\"\n    }\n  ],\n  \"result\": \"Hello, world. I am John. Is the weather sunny today?\"\n}"
     }
   ],
   [
@@ -14,7 +14,7 @@
   [
     {
       "msg": "sync.func.swap.return",
-      "data": "{\n  \"args\": [\n    [\n      \"Hello\",\n      \"world\"\n    ]\n  ],\n  \"result\": [\n    \"world\",\n    \"Hello\"\n  ]\n}"
+      "data": "{\n  \"name\": \"swap\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FedgeCases\\u002Finput.ts\",\n  \"args\": [\n    [\n      \"Hello\",\n      \"world\"\n    ]\n  ],\n  \"result\": [\n    \"world\",\n    \"Hello\"\n  ]\n}"
     }
   ],
   [
@@ -29,7 +29,7 @@
   [
     {
       "msg": "sync.func.main.return",
-      "data": "{\n  \"args\": [],\n  \"result\": undefined\n}"
+      "data": "{\n  \"name\": \"main\",\n  \"path\": \"\\u002FUsers\\u002Fnizarmah\\u002FPersonal\\u002Fmocktender\\u002Fsrc\\u002Fcmd\\u002Ftracer\\u002Ftestdata\\u002FinstrumentedCode\\u002FedgeCases\\u002Finput.ts\",\n  \"args\": [],\n  \"result\": undefined\n}"
     }
   ]
 ]

@@ -3,6 +3,9 @@ const config = {
   // Use node not browser.
   testEnvironment: "node",
 
+  // Disable caching, so transformer updates are reflected.
+  cache: false,
+
   // Jest setup, mainly for globals.
   setupFiles: [
     // Add tracing globals.

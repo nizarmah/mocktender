@@ -1,5 +1,5 @@
 function fibonacci(n: number, mem: number[]): number {
-    function __fn(n: number, mem: number[]): number {
+    function fibonacci(n: number, mem: number[]): number {
         if (mem[n] !== undefined) {
             return mem[n];
         }
@@ -12,28 +12,28 @@ function fibonacci(n: number, mem: number[]): number {
         mem[n] = a + b;
         return mem[n];
     }
-    return __tsf("fibonacci", __fn, this, [
+    return __tsf(fibonacci, __filename, this, [
         n,
         mem
     ]);
 }
 const fibonacciSequence = (n: number): number[] => {
-    function __fn(n: number): number[] {
+    function fibonacciSequence(n: number): number[] {
         const mem: number[] = [];
         fibonacci(n, mem);
         return mem;
     }
-    return __tsf("fibonacciSequence", __fn, this, [
+    return __tsf(fibonacciSequence, __filename, this, [
         n
     ]);
 };
 export function main() {
-    function __fn() {
+    function main() {
         const sequence = fibonacciSequence(10);
         console.log({
             msg: "syncFn.main.fibonacciSequence.done",
             result: sequence.join(", "),
         });
     }
-    return __tsf("main", __fn, this, []);
+    return __tsf(main, __filename, this, []);
 }
