@@ -67,7 +67,7 @@ function * maybeWrapStatement (
   // Function declaration.
   if (
     isFunctionDeclaration(node) &&
-    hasBridgeJsDoc(node)
+    shouldBeInstrumented(node)
   ) {
     yield wrapFunctionDeclaration(node)
     return
@@ -76,7 +76,7 @@ function * maybeWrapStatement (
   // Possibly an arrow function.
   if (
     isVariableStatement(node) &&
-    hasBridgeJsDoc(node)
+    shouldBeInstrumented(node)
   ) {
     yield * maybeWrapVariableStatement(node)
     return
@@ -85,16 +85,38 @@ function * maybeWrapStatement (
   yield node
 }
 
-// hasBridgeJsDoc checks if a node has a bridge JSDoc comment.
-// Wrapping every function generates a lot of noise, so we only wrap
-// functions that bridge integrations/services with units/modules.
-function hasBridgeJsDoc (node: Node): boolean {
+// ShouldBeInstrumented checks if a node should be instrumented.
+// Codebases are huge, and if we instrument every function, we'll generate a lot of noise.
+// So, we only instrument functions that serve a specific purpose.
+function shouldBeInstrumented (node: Node): boolean {
+  return hasBridgeJSDocTag(node) || hasEntrypointJSDocTag(node)
+}
+
+// HasBridgeJSDoc checks for `@bridge` JSDoc tag.
+// Bridge funcs live between two separate "components".
+// Eg. A server with a route, and a handler invoked by that route.
+// We trace their behavior so that we can isolate the components.
+function hasBridgeJSDocTag (node: Node): boolean {
+  return getJSDocTags(node).some((tag) => tag === "bridge")
+}
+
+// HasEntrypointJSDoc checks for `@entrypoint` JSDoc tag.
+// Entrypoint funcs are the main entry point for the program.
+// Eg. A server with a route, or a boot script.
+// We trace their behavior so we can re-use it in isolation.
+function hasEntrypointJSDocTag (node: Node): boolean {
+  return getJSDocTags(node).some((tag) => tag === "entrypoint")
+}
+
+// GetJSDocTags returns all JSDoc tags from a node.
+function getJSDocTags (node: Node): string[] {
   // FIXME: This is a hack to access the `jsDoc` private property on a node.
   // Correct usage (`getJSDocCommentsAndTags`) requires `setParentNodes: true`.
   // But circular references it causes aren't supported, check `createSourceFile`.
   type NodeWithJsDoc = Node & { jsDoc?: JSDoc[] }
   const nodeWithJsDocProp = (node as unknown) as NodeWithJsDoc
 
+  const tags: string[] = []
   for (const doc of nodeWithJsDocProp.jsDoc ?? []) {
     if (doc.tags === undefined) continue
 
@@ -102,13 +124,13 @@ function hasBridgeJsDoc (node: Node): boolean {
     // - JSDocs are usually small in number (usually < 3).
     // - Tags are also usually small in number (usually < 10).
     for (const tag of doc.tags) {
-      if (tag.tagName.text === "bridge") {
-        return true
-      }
+      if (tag.tagName.text === "") continue
+
+      tags.push(tag.tagName.text)
     }
   }
 
-  return false
+  return tags
 }
 
 // Try to wrap a variable statement, if it's supported.

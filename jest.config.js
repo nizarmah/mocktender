@@ -1,6 +1,6 @@
-const tracer = "<rootDir>/src/cmd/tracer/index.ts"
-/** @type {import('./src/cmd/tracer').Config} */
-const tracerConfig = {
+const recorder = "<rootDir>/src/cmd/recorder/index.ts"
+/** @type {import('./src/cmd/recorder').Config} */
+const recorderConfig = {
   transformer: {
     lib: "babel-jest",
     config: undefined
@@ -8,35 +8,40 @@ const tracerConfig = {
 }
 
 /** @type {import('jest').Config} */
-const config = {
-  // Use node not browser.
-  testEnvironment: "node",
-
+const commonConfig = {
   // Disable caching, so transformer updates are reflected.
   cache: false,
 
-  // Jest setup, mainly for globals.
-  // AfterEnv because we use Jest globals.
-  setupFilesAfterEnv: [
-    // Add tracing globals.
-    "<rootDir>/src/cmd/tracer/globals.ts",
-  ],
-
-  // Transforms source code.
-  transform: {
-    "src/cmd/tracer/globals.ts": "babel-jest",
-    "src/pkg/instrumenter/lib.ts": "babel-jest",
-
-    // Enable tracing.
-    "\\.[jt]sx?$": [tracer, tracerConfig],
-  },
-
   // Ignores tests that match the pattern.
-  testPathIgnorePatterns: [
-    // Tests under tracer/testdata are run programmatically.
-    // Reference: `<rootDir>/src/cmd/tracer/index.test.ts`.
-    "<rootDir>/src/cmd/tracer/testdata/*.test.ts",
+  modulePathIgnorePatterns: [
+    // Tests under /testdata/ are run programmatically.
+    // Eg. `<rootDir>/src/cmd/recorder/index.test.ts`.
+    "/testdata/",
   ],
+}
+
+/** @type {import('jest').Config} */
+const config = {
+  projects: [
+    {
+      ...commonConfig,
+      displayName: "record",
+
+      setupFilesAfterEnv: [
+        // Add tracing globals.
+        "<rootDir>/src/cmd/recorder/globals.ts",
+      ],
+
+      transform: {
+        // The following files are setup files for the recorder.
+        // They should not be instrumented.
+        "src/cmd/recorder/globals.ts": "babel-jest",
+        "src/pkg/instrumenter/lib.ts": "babel-jest",
+
+        // Enable tracing.
+        "\\.[jt]sx?$": [recorder, recorderConfig],
+      },
+    }
 }
 
 export default config

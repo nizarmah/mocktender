@@ -8,14 +8,14 @@ import serialize from "serialize-javascript"
 
 import type { Log } from "../../pkg/instrumenter/types.ts"
 
-// Main is the entrypoint for the mocker script.
+// Main is the entrypoint for the cacher script.
 export async function main() {
   const args = process.argv.slice(2)
 
   const [inputPath, outputPath] = args
   if (!inputPath || !outputPath) {
     throw new Error(
-      "Usage: ./src/cmd/mocker <tracer-stdout-log-path> <cached-behavior-file-path>"
+      "Usage: ./src/cmd/mocker <recorder-stdout-log-path> <cached-behavior-file-path>"
     )
   }
 
@@ -37,7 +37,7 @@ export async function main() {
   )
 }
 
-// BuildBehaviorMap builds a map of all the behaviors recorded by the tracer.
+// BuildBehaviorMap builds a map of all the behaviors recorded by the recorder.
 // This allows us to re-use these behaviors in "replay" mode.
 async function buildBehaviorMap(rl: ReadlineInterface) {
   const behaviorMap: Record<
@@ -46,7 +46,7 @@ async function buildBehaviorMap(rl: ReadlineInterface) {
       Log["name"],
       Record<
         Log["rid"],
-        Log["data"]
+        Log["data"][]
       >
     >
   > = {}
@@ -62,12 +62,11 @@ async function buildBehaviorMap(rl: ReadlineInterface) {
       behaviorMap[log.path][log.name] = {}
     }
 
-    const shortRID = log.rid.split("-").pop()
-    if (!shortRID) {
-      throw new Error("Invalid rid")
+    if (!(log.rid in behaviorMap[log.path][log.name])) {
+      behaviorMap[log.path][log.name][log.rid] = []
     }
 
-    behaviorMap[log.path][log.name][shortRID] = log.data
+    behaviorMap[log.path][log.name][log.rid].push(log.data)
   }
   return behaviorMap
 }

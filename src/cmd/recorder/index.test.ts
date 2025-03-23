@@ -6,6 +6,7 @@ import { createReadStream, readFileSync } from "node:fs"
 import type { Log } from "../../pkg/instrumenter/types.ts"
 
 type TestCase = {
+  rid: string
   desc: string
   test: string
   logs: Omit<Log, "rid" | "time">[]
@@ -13,16 +14,17 @@ type TestCase = {
 
 const tt: TestCase[] = [
   {
+    rid: "recorder-dummy",
     desc: "dummy",
     test: "testdata/dummy/index.test.ts",
     logs: [
       {
         msg: "sync.func.instrumentSource.return",
         name: "instrumentSource",
-        path: "/Users/nizarmah/Personal/mocktender/src/pkg/instrumenter/client.ts",
+        path: path.join(process.cwd(), "src/pkg/instrumenter/client.ts"),
         data: {
           args: [
-            "/Users/nizarmah/Personal/mocktender/src/cmd/tracer/testdata/dummy/index.test.ts",
+            path.join(__dirname, "testdata/dummy/index.test.ts"),
             (
               "import { main } from \"./index.ts\"\n"
               + "\n"
@@ -46,10 +48,10 @@ const tt: TestCase[] = [
       {
         msg: "sync.func.instrumentSource.return",
         name: "instrumentSource",
-        path: "/Users/nizarmah/Personal/mocktender/src/pkg/instrumenter/client.ts",
+        path: path.join(process.cwd(), "src/pkg/instrumenter/client.ts"),
         data: {
           args: [
-            "/Users/nizarmah/Personal/mocktender/src/cmd/tracer/testdata/dummy/index.ts",
+            path.join(__dirname, "testdata/dummy/index.ts"),
             (
               "function greet(name: string) {\n"
               + "  return `Hello, ${name}!`\n"
@@ -80,22 +82,28 @@ function deserialize(str: string) {
   return eval(`(${str})`)
 }
 
-describe("tracer", () => {
-  it.each(tt)("tracer behavior on: $desc", async (tc) => {
-    // Programmatically runs Jest so the Tracer instruments itself.
-    // Usually, when running the Tracer with Jest, we only get the tested code behavior.
-    // With this workaround, we get the Tracer's behavior as well.
-    await runJest([
-      path.join(__dirname, tc.test),
-    ])
+describe("recorder", () => {
+  it.each(tt)("traces behavior for: $desc", async (tc) => {
+    // We set the RID so we can reference it later during replays.
+    // This is super hacky at the moment, because it's the cheapest solution.
+    // TODO: infer this using combining test path, suite name, & name in a custom Jest Env.
+    global.__rid = tc.rid
+
+    // Programmatically runs Jest so the Recorder instruments itself.
+    // Usually, when running the Recorder with Jest, we only get the tested code behavior.
+    // With this workaround, we get the Recorder's behavior as well.
+    await runJest(
+      [path.join(__dirname, tc.test)],
+      path.join(__dirname, "testdata")
+    )
 
     // Ensure there are no errors.
-    const stderr = readFileSync(path.join(process.cwd(), "tracer.stderr.log"), "utf-8")
+    const stderr = readFileSync(path.join(process.cwd(), "recorder.stderr.log"), "utf-8")
     expect(stderr).toBe("")
 
     // Prepare to read the output line by line.
     const stdout = createReadline({
-      input: createReadStream(path.join(process.cwd(), "tracer.stdout.log"), "utf-8")
+      input: createReadStream(path.join(process.cwd(), "recorder.stdout.log"), "utf-8")
     })
 
     // Collect logs so we avoid conditionals for index.
@@ -115,7 +123,7 @@ describe("tracer", () => {
       const want = wantLogs[i]
 
       // RID should match across all logs of the same run.
-      expect(gotRID).toStrictEqual(global.__rid)
+      expect(gotRID).toStrictEqual(tc.rid)
 
       // Check if the log matches the expected log.
       expect(got).toMatchObject(want)

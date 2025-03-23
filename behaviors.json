@@ -1,13 +1,22 @@
 {
     "\u002FUsers\u002Fnizarmah\u002FPersonal\u002Fmocktender\u002Fsrc\u002Fpkg\u002Finstrumenter\u002Fclient.ts": {
         "instrumentSource": {
-            "ae2be5653674": {
-                "args": [
-                    "\u002FUsers\u002Fnizarmah\u002FPersonal\u002Fmocktender\u002Fsrc\u002Fcmd\u002Ftracer\u002Ftestdata\u002Fdummy\u002Findex.ts",
-                    "function greet(name: string) {\n  return `Hello, ${name}!`\n}\n\nexport function main() {\n  return greet(\"world\")\n}\n"
-                ],
-                "result": "function greet(name: string) {\n    return `Hello, ${name}!`;\n}\nexport function main() {\n    return greet(\"world\");\n}\n"
-            }
+            "recorder-dummy": [
+                {
+                    "args": [
+                        "\u002FUsers\u002Fnizarmah\u002FPersonal\u002Fmocktender\u002Fsrc\u002Fcmd\u002Frecorder\u002Ftestdata\u002Fdummy\u002Findex.test.ts",
+                        "import { main } from \".\u002Findex.ts\"\n\ndescribe(\"dummy\", () =\u003E {\n  it(\"should return a greeting\", () =\u003E {\n    expect(main()).toStrictEqual(\"Hello, world!\")\n  })\n})\n"
+                    ],
+                    "result": "import { main } from \".\u002Findex.ts\";\ndescribe(\"dummy\", () =\u003E {\n    it(\"should return a greeting\", () =\u003E {\n        expect(main()).toStrictEqual(\"Hello, world!\");\n    });\n});\n"
+                },
+                {
+                    "args": [
+                        "\u002FUsers\u002Fnizarmah\u002FPersonal\u002Fmocktender\u002Fsrc\u002Fcmd\u002Frecorder\u002Ftestdata\u002Fdummy\u002Findex.ts",
+                        "function greet(name: string) {\n  return `Hello, ${name}!`\n}\n\nexport function main() {\n  return greet(\"world\")\n}\n"
+                    ],
+                    "result": "function greet(name: string) {\n    return `Hello, ${name}!`;\n}\nexport function main() {\n    return greet(\"world\");\n}\n"
+                }
+            ]
         }
     }
 }

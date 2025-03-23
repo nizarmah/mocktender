@@ -438,11 +438,11 @@ const __l = (() => {
   // Create streams for stdout and stderr in the closure.
   // TODO: Improve this by using dependency injection.
   const stdout = createWriteStream(
-    path.join(process.cwd(), "tracer.stdout.log"),
+    path.join(process.cwd(), "recorder.stdout.log"),
     { flags: "a", encoding: "utf-8" }
   )
   const stderr = createWriteStream(
-    path.join(process.cwd(), "tracer.stderr.log"),
+    path.join(process.cwd(), "recorder.stderr.log"),
     { flags: "a", encoding: "utf-8" }
   )
 

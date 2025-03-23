@@ -19,13 +19,13 @@
 !src
 
 !src/cmd
-!src/cmd/mocker
-!src/cmd/tracer
-!src/cmd/tracer/testdata
-!src/cmd/tracer/testdata/dummy
+!src/cmd/behavior-cacher
+!src/cmd/recorder
+!src/cmd/recorder/testdata
+!src/cmd/recorder/testdata/dummy
 
 !src/pkg
 !src/pkg/instrumenter
-!src/pkg/monkeypatch
+!src/pkg/transformer
 
 !**/*.ts

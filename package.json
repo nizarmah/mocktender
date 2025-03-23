@@ -4,21 +4,20 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "clean": "rm -f tracer.stdout.log tracer.stderr.log",
+    "clean": "rm -f recorder.stdout.log recorder.stderr.log",
     "lint": "eslint --fix",
-    "test:record": "yarn test:record:run && yarn test:record:cache",
+    "test:record": "yarn clean && yarn build && yarn test:record:run && yarn test:record:cache",
+    "test:record:dry-run": "yarn clean && yarn build && yarn test:record:run",
     "test:replay": "echo 'todo'",
-    "test:record:dry-run": "yarn test:record:run",
-    "test:record:run": "yarn clean && yarn build && node --experimental-strip-types ./node_modules/.bin/jest",
-    "test:record:cache": "yarn build && node --experimental-strip-types ./src/cmd/mocker/index.ts ./tracer.stdout.log ./behaviors.json"
+    "test:record:run": "node --experimental-strip-types ./node_modules/.bin/jest --selectProjects record",
+    "test:record:cache": "node --experimental-strip-types ./src/cmd/behavior-cacher/index.ts ./recorder.stdout.log ./behaviors.json",
   },
   "peerDependencies": {
     "@jest/transform": "^29",
     "typescript": "^5"
   },
   "dependencies": {
-    "serialize-javascript": "^6",
-    "uuid": "^11.1.0"
+    "serialize-javascript": "^6"
   },
   "devDependencies": {
     "@babel/preset-env": "^7",
@@ -38,8 +37,7 @@
       "typescript": "Typescript"
     },
     "dependencies": {
-      "serialize-javascript": "Instrumenter serializer",
-      "uuid": "UUID generator to track unique runs"
+      "serialize-javascript": "Instrumenter serializer"
     },
     "devDependencies": {
       "@babel/preset-env": "Jest TS support",
