@@ -1,8 +1,8 @@
 /* eslint-disable no-var */
 import { v4 as uuidv4 } from "uuid"
 
-import { __taf, __tag, __tsf, __tsg } from "../../pkg/instrumentation/lib.ts"
-import type { AsyncFn, AsyncGn, SyncFn, SyncGn, TracerFn } from "../../pkg/instrumentation/lib.ts"
+import { __taf, __tag, __tsf, __tsg } from "../../pkg/instrumenter/lib.ts"
+import type { AsyncFn, AsyncGn, SyncFn, SyncGn, TracerFn } from "../../pkg/instrumenter/lib.ts"
 
 declare global {
   // Tracer functions.
@@ -21,5 +21,8 @@ global.__tsf = __tsf
 global.__tsg = __tsg
 
 beforeEach(() => {
+  // We use UUIDs because it's the cheapest solution at the moment.
+  // The ideal solution is using: test path, test suite name, & test name.
+  // TODO: Improve this by using a custom Jest env to remove randomness.
   global.__rid = uuidv4()
 })

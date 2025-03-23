@@ -19,5 +19,6 @@ Serves mocks.
 3. Run tests.
 
     ```bash
+    # rm tracer.stdout.log tracer.stderr.log
     yarn dev
     ```

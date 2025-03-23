@@ -6,43 +6,11 @@ import type {
   TransformOptions
 } from "@jest/transform"
 
-import { instrument } from "../../pkg/monkeypatch/instrument.ts"
-import { createSourceFile, printSourceFile } from "../../pkg/typescript/index.ts"
+import { instrumentSource } from "../../pkg/instrumenter/client.ts"
 
-type Config = Partial<{
-  transformer: {
-    lib: string
-    config: unknown
-  }
-}>
+import type { Config } from "./types.ts"
 
-const defaultConfig: Config = {
-  // Jest's default transformer that we want to extend.
-  transformer: {
-    lib: "babel-jest",
-    config: {}
-  }
-}
-
-export default {
-  async createTransformer(overrides: Config = {}) {
-    const config = { ...defaultConfig, ...overrides }
-
-    if (
-      !config.transformer ||
-      !config.transformer.lib
-    ) {
-      throw new Error("Transformer is required")
-    }
-
-    const factory = await import(config.transformer.lib)
-    const transformer: Transformer = factory.createTransformer(config.transformer.config)
-
-    return new Tracer(transformer)
-  }
-}
-
-class Tracer implements SyncTransformer<Config> {
+export class Tracer implements SyncTransformer<Config> {
   private transformer: Transformer
 
   constructor (transformer: Transformer) {
@@ -86,7 +54,7 @@ class Tracer implements SyncTransformer<Config> {
   }
 }
 
-// Wrapping `Tracer` helps extend the transformer, without replacing it.
+// WrappedProcessor processes the source code with Tracer, then the wrapped transformer.
 function wrappedProcessor<
   T extends SyncTransformer['process'] | AsyncTransformer['processAsync'],
   R extends ReturnType<T> = ReturnType<T>
@@ -96,13 +64,15 @@ function wrappedProcessor<
   options: TransformOptions<Config | undefined>,
   nextProcess: T
 ): R {
-  // Remove `Tracer` config, otherwise some transformers will fail.
+  // For Jest, the transformer is Tracer, so options.transformerConfig is `TracerConfig`.
+  // But the wrapped transformer expects the config in `TracerConfig.transformer.config`.
   const transformerOptions = {
     ...options,
+    // Replace the Tracer config with the wrapped transformer's config.
     transformerConfig: options.transformerConfig?.transformer?.config
   }
 
-  // We only support TS files for now.
+  // Only support TS files for now.
   if (!sourcePath.endsWith(".ts")) {
     return nextProcess(sourceText, sourcePath, transformerOptions) as R
   }
@@ -110,20 +80,4 @@ function wrappedProcessor<
   const instrumented = instrumentSource(sourcePath, sourceText)
 
   return nextProcess(instrumented, sourcePath, transformerOptions) as R
-}
-
-// Instrument the source code.
-export function instrumentSource(
-  sourcePath: string,
-  sourceText: string
-): string {
-  // Without this, the instrumentation lib will get infinite recursion.
-  if (sourcePath.endsWith("instrumentation/lib.ts")) {
-    return sourceText
-  }
-
-  const source = createSourceFile(sourcePath, sourceText)
-  const instrumented = instrument(source)
-
-  return printSourceFile(instrumented)
 }

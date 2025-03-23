@@ -1,3 +1,6 @@
+import { Console } from "node:console"
+import { createWriteStream } from "node:fs"
+import path from "node:path"
 import serialize from "serialize-javascript"
 
 export type SyncFn = (...args: unknown[]) => unknown
@@ -318,7 +321,6 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
   }
 }
 
-
 // Wraps an **async** iterator so that .next(), .throw(), .return() all get logged.
 function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): AsyncIterableIterator<unknown, unknown> {
   return {
@@ -395,17 +397,39 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
 }
 
 // Log a message.
-const __l = (msg: string, data: Record<string, unknown>) => {
-  console.log({
-    msg,
-    rid: global.__rid,
-    time: Date.now(),
-    data: __s(data),
-  })
-}
+const __l = (() => {
+  // Create streams for stdout and stderr in the closure.
+  // TODO: Improve this by using dependency injection.
+  const stdout = createWriteStream(
+    path.join(process.cwd(), "tracer.stdout.log"),
+    { flags: "a", encoding: "utf-8" }
+  )
+  const stderr = createWriteStream(
+    path.join(process.cwd(), "tracer.stderr.log"),
+    { flags: "a", encoding: "utf-8" }
+  )
+
+  // Create a logger that writes to the streams.
+  // TODO: Improve this by using dependency injection.
+  const logger = new Console(stdout, stderr)
+
+  return (msg: string, data: Record<string, unknown>) => {
+    // Runtime ID ties logs of the same run to handle stateful operations.
+    // Eg. Creating user in DB with same email fails if user already exists.
+    // TODO: Improve this by passing it as a parameter to logger.
+    const runtimeID = global.__rid
+
+    logger.log(__s({
+      rid: runtimeID,
+      time: Date.now(),
+      msg,
+      data,
+    }))
+  }
+})()
 
 // Serialize a value to a string.
 const __s = (v: unknown): string => {
   // TODO: Handle circular references, check `createSourceFile`.
-  return serialize(v, { space: 2 })
+  return serialize(v)
 }

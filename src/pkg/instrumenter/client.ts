@@ -7,7 +7,27 @@ import {
 } from 'typescript'
 import type { SourceFile } from 'typescript'
 
-export function createSourceFile (
+import { instrument } from "../monkeypatch/instrument.ts"
+
+// instrumentSource adds tracing to the source code.
+/** @bridge `cmd/tracer` integration and `pkg/monkeypatch` unit. */
+export function instrumentSource(
+  sourcePath: string,
+  sourceText: string
+): string {
+  // Don't trace the tracing lib, otherwise we'll get infinite recursion.
+  // This is a temporary hack until we use dependency injection for tracing lib.
+  if (sourcePath.endsWith("instrumenter/lib.ts")) {
+    return sourceText
+  }
+
+  const source = createSourceFile(sourcePath, sourceText)
+  const instrumented = instrument(source)
+
+  return printSourceFile(instrumented)
+}
+
+function createSourceFile (
   path: string,
   content: string
 ): SourceFile {
@@ -29,7 +49,7 @@ export function createSourceFile (
   }
 }
 
-export function printSourceFile (
+function printSourceFile (
   sourceFile: SourceFile
 ): string {
   try {

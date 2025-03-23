@@ -33,7 +33,7 @@
       "typescript": "Typescript"
     },
     "dependencies": {
-      "serialize-javascript": "Instrumentation serializer",
+      "serialize-javascript": "Instrumenter serializer",
       "uuid": "UUID generator to track unique runs"
     },
     "devDependencies": {

@@ -1,102 +1,129 @@
-import { readFileSync, writeFileSync } from "node:fs"
+import { run as runJest } from "jest"
+import { createInterface as createReadline } from "node:readline"
 import path from "node:path"
+import { createReadStream, readFileSync } from "node:fs"
 
-import { instrumentSource } from "./transformer.ts"
+type Log = {
+  rid: string
+  time: number
+  msg: string
+  data: Record<string, unknown>
+}
 
 type TestCase = {
   desc: string
-  in: string
-  out: string
-  logs: string
-}
-
-type Log = {
-  msg: string
-  rid: string
-  time: number
-  data: Record<string, unknown>
+  test: string
+  logs: Omit<Log, "rid" | "time">[]
 }
 
 const tt: TestCase[] = [
   {
-    desc: "async functions",
-    in: "./src/cmd/tracer/testdata/instrumentedCode/asyncFn/input.ts",
-    out: "./src/cmd/tracer/testdata/instrumentedCode/asyncFn/output.js",
-    logs: "./src/cmd/tracer/testdata/instrumentedCode/asyncFn/logs.json",
-  },
-  {
-    desc: "sync functions",
-    in: "./src/cmd/tracer/testdata/instrumentedCode/syncFn/input.ts",
-    out: "./src/cmd/tracer/testdata/instrumentedCode/syncFn/output.js",
-    logs: "./src/cmd/tracer/testdata/instrumentedCode/syncFn/logs.json",
-  },
-  {
-    desc: "sync generators",
-    in: "./src/cmd/tracer/testdata/instrumentedCode/syncGn/input.ts",
-    out: "./src/cmd/tracer/testdata/instrumentedCode/syncGn/output.js",
-    logs: "./src/cmd/tracer/testdata/instrumentedCode/syncGn/logs.json",
-  },
-  {
-    desc: "edge cases",
-    in: "./src/cmd/tracer/testdata/instrumentedCode/edgeCases/input.ts",
-    out: "./src/cmd/tracer/testdata/instrumentedCode/edgeCases/output.js",
-    logs: "./src/cmd/tracer/testdata/instrumentedCode/edgeCases/logs.json",
-  },
+    desc: "dummy",
+    test: "testdata/dummy/index.test.ts",
+    logs: [
+      {
+        msg: "sync.func.instrumentSource.return",
+        data: {
+          name: "instrumentSource",
+          path: "/Users/nizarmah/Personal/mocktender/src/pkg/instrumenter/client.ts",
+          args: [
+            "/Users/nizarmah/Personal/mocktender/src/cmd/tracer/testdata/dummy/index.test.ts",
+            (
+              "import { main } from \"./index.ts\"\n"
+              + "\n"
+              + "describe(\"dummy\", () => {\n"
+              + "  it(\"should return a greeting\", () => {\n"
+              + "    expect(main()).toStrictEqual(\"Hello, world!\")\n"
+              + "  })\n"
+              + "})\n"
+            )
+          ],
+          result: (
+            "import { main } from \"./index.ts\";\n"
+            + "describe(\"dummy\", () => {\n"
+            + "    it(\"should return a greeting\", () => {\n"
+            + "        expect(main()).toStrictEqual(\"Hello, world!\");\n"
+            + "    });\n"
+            + "});\n"
+          )
+        }
+      },
+      {
+        msg: "sync.func.instrumentSource.return",
+        data: {
+          name: "instrumentSource",
+          path: "/Users/nizarmah/Personal/mocktender/src/pkg/instrumenter/client.ts",
+          args: [
+            "/Users/nizarmah/Personal/mocktender/src/cmd/tracer/testdata/dummy/index.ts",
+            (
+              "function greet(name: string) {\n"
+              + "  return `Hello, ${name}!`\n"
+              + "}\n"
+              + "\n"
+              + "export function main() {\n"
+              + "  return greet(\"world\")\n"
+              + "}\n"
+            )
+          ],
+          result: (
+            "function greet(name: string) {\n"
+            + "    return `Hello, ${name}!`;\n"
+            + "}\n"
+            + "export function main() {\n"
+            + "    return greet(\"world\");\n"
+            + "}\n"
+          )
+        }
+      }
+    ]
+  }
 ]
 
+// Deserialize deserializes strings serialized with `serialize-javascript`.
+// Ref: https://www.npmjs.com/package/serialize-javascript#deserializing.
+function deserialize(str: string) {
+  return eval(`(${str})`)
+}
+
 describe("tracer", () => {
-  const logQueue: Log[] = []
-  const mockLog = (log: Log) => logQueue.push(log)
+  it.each(tt)("tracer behavior on: $desc", async (tc) => {
+    // Programmatically runs Jest so the Tracer instruments itself.
+    // Usually, when running the Tracer with Jest, we only get the tested code behavior.
+    // With this workaround, we get the Tracer's behavior as well.
+    await runJest([
+      path.join(__dirname, tc.test),
+    ])
 
-  beforeEach(() => {
-    logQueue.length = 0
-    jest.spyOn(console, "log").mockImplementation(mockLog)
-  })
+    // Ensure there are no errors.
+    const stderr = readFileSync(path.join(process.cwd(), "tracer.stderr.log"), "utf-8")
+    expect(stderr).toBe("")
 
-  describe("tracer/validate", () => {
-    it.each(tt)("instruments $desc", async (tc) => {
-      const input = readFileSync(tc.in, "utf-8")
-
-      const got = instrumentSource(tc.in, input)
-      const want = readFileSync(tc.out, "utf-8")
-
-      expect(got).toStrictEqual(want)
+    // Prepare to read the output line by line.
+    const stdout = createReadline({
+      input: createReadStream(path.join(process.cwd(), "tracer.stdout.log"), "utf-8")
     })
 
-    it.each(tt)("records $desc io", async (tc) => {
-      const { main } = await import(path.join(process.cwd(), tc.in))
-      await main()
+    // Collect logs so we avoid conditionals for index.
+    // More memory usage, but better readability for tests.
+    const gotLogs: Log[] = []
+    for await (const line of stdout) {
+      gotLogs.push(deserialize(line))
+    }
 
-      const logCache: Log[] = JSON.parse(readFileSync(tc.logs, "utf-8"))
+    const wantLogs = tc.logs
 
-      expect(logQueue.length).toStrictEqual(logCache.length)
+    // Check if the number of logs is the same.
+    expect(gotLogs.length).toStrictEqual(wantLogs.length)
 
-      logQueue.forEach((log, i) => {
-        const { rid: gotRID, time: gotTime, ...got } = log
-        const { rid: _rid, time: _time, ...want } = logCache[i]
+    // Compare each log.
+    gotLogs.forEach(({ rid: gotRID, time: _gotTime, ...got }, i) => {
+      const want = wantLogs[i]
 
-        expect(gotRID).toStrictEqual(global.__rid)
-        expect(gotTime).toStrictEqual(expect.any(Number))
+      // RID should match across all logs of the same run.
+      expect(gotRID).toStrictEqual(global.__rid)
 
-        expect(got).toStrictEqual(want)
-      })
-    })
-  })
-
-  describe.skip("tracer/generate", () => {
-    it.each(tt)("instruments $desc", async (tc) => {
-      const input = readFileSync(tc.in, "utf-8")
-
-      const got = instrumentSource(tc.in, input)
-
-      writeFileSync(tc.out, got)
-    })
-
-    it.each(tt)("records $desc io", async (tc) => {
-      const { main } = await import(path.join(process.cwd(), tc.in))
-      await main()
-
-      writeFileSync(tc.logs, JSON.stringify(logQueue, null, 2))
+      // Check if the log matches the expected log.
+      expect(got).toMatchObject(want)
     })
   })
 })

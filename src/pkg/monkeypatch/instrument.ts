@@ -17,7 +17,9 @@ import type {
   Expression,
   FunctionDeclaration,
   Identifier,
+  JSDoc,
   ModifierLike,
+  Node,
   NodeArray,
   ParameterDeclaration,
   SourceFile,
@@ -63,18 +65,50 @@ function * maybeWrapStatement (
   // TODO: Add support for more function types.
 
   // Function declaration.
-  if (isFunctionDeclaration(node)) {
+  if (
+    isFunctionDeclaration(node) &&
+    hasBridgeJsDoc(node)
+  ) {
     yield wrapFunctionDeclaration(node)
     return
   }
 
   // Possibly an arrow function.
-  if (isVariableStatement(node)) {
+  if (
+    isVariableStatement(node) &&
+    hasBridgeJsDoc(node)
+  ) {
     yield * maybeWrapVariableStatement(node)
     return
   }
 
   yield node
+}
+
+// hasBridgeJsDoc checks if a node has a bridge JSDoc comment.
+// Wrapping every function generates a lot of noise, so we only wrap
+// functions that bridge integrations/services with units/modules.
+function hasBridgeJsDoc (node: Node): boolean {
+  // FIXME: This is a hack to access the `jsDoc` private property on a node.
+  // Correct usage (`getJSDocCommentsAndTags`) requires `setParentNodes: true`.
+  // But circular references it causes aren't supported, check `createSourceFile`.
+  type NodeWithJsDoc = Node & { jsDoc?: JSDoc[] }
+  const nodeWithJsDocProp = (node as unknown) as NodeWithJsDoc
+
+  for (const doc of nodeWithJsDocProp.jsDoc ?? []) {
+    if (doc.tags === undefined) continue
+
+    // This inner loop is fine because:
+    // - JSDocs are usually small in number (usually < 3).
+    // - Tags are also usually small in number (usually < 10).
+    for (const tag of doc.tags) {
+      if (tag.tagName.text === "bridge") {
+        return true
+      }
+    }
+  }
+
+  return false
 }
 
 // Try to wrap a variable statement, if it's supported.
