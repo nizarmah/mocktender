@@ -1,6 +1,5 @@
 import { Console } from "node:console"
 import { createWriteStream } from "node:fs"
-import path from "node:path"
 import serialize from "serialize-javascript"
 
 import type { Log } from "./types.ts"
@@ -437,14 +436,14 @@ function __wai(
 const __l = (() => {
   // Create streams for stdout and stderr in the closure.
   // TODO: Improve this by using dependency injection.
-  const stdout = createWriteStream(
-    path.join(process.cwd(), "recorder.stdout.log"),
-    { flags: "a", encoding: "utf-8" }
-  )
-  const stderr = createWriteStream(
-    path.join(process.cwd(), "recorder.stderr.log"),
-    { flags: "a", encoding: "utf-8" }
-  )
+  const stdout = createWriteStream(global.__tracerStdout, {
+    flags: "a",
+    encoding: "utf-8",
+  })
+  const stderr = createWriteStream(global.__tracerStderr, {
+    flags: "a",
+    encoding: "utf-8",
+  })
 
   // Create a logger that writes to the streams.
   // TODO: Improve this by using dependency injection.

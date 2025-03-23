@@ -1,5 +1,3 @@
-import { createReadStream, writeFileSync } from "node:fs"
-import path from "node:path"
 import {
   createInterface as createReadline,
   Interface as ReadlineInterface,
@@ -9,32 +7,16 @@ import serialize from "serialize-javascript"
 import type { Log } from "../../pkg/instrumenter/types.ts"
 
 // Main is the entrypoint for the cacher script.
-export async function main() {
-  const args = process.argv.slice(2)
-
-  const [inputPath, outputPath] = args
-  if (!inputPath || !outputPath) {
-    throw new Error(
-      "Usage: ./src/cmd/mocker <recorder-stdout-log-path> <cached-behavior-file-path>"
-    )
-  }
-
+export async function cacheBehaviors(
+  readStream: NodeJS.ReadableStream,
+): Promise<string> {
   const behaviors = await buildBehaviorMap(
     createReadline({
-      input: createReadStream(
-        path.join(process.cwd(), inputPath)
-      ),
+      input: readStream,
     })
   )
 
-  writeFileSync(
-    path.join(process.cwd(), outputPath),
-    serialize(behaviors, { space: 4 }),
-    {
-      flag: "w",
-      encoding: "utf-8",
-    }
-  )
+  return serialize(behaviors, { space: 4 })
 }
 
 // BuildBehaviorMap builds a map of all the behaviors recorded by the recorder.
@@ -66,6 +48,7 @@ async function buildBehaviorMap(rl: ReadlineInterface) {
       behaviorMap[log.path][log.name][log.rid] = []
     }
 
+    // TODO: Order by timestamp.
     behaviorMap[log.path][log.name][log.rid].push(log.data)
   }
   return behaviorMap

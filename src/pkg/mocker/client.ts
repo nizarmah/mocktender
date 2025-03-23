@@ -7,18 +7,19 @@ import {
 } from 'typescript'
 import type { SourceFile } from 'typescript'
 
-import { instrument } from "./monkeypatch.ts"
+import { mock } from "./monkeypatch.ts"
 
-// instrumentSource adds tracing to the source code.
-/** @bridge `cmd/recorder` integration and `pkg/instrumenter` unit. */
-export function instrumentSource(
+// mockSource adds mocking to the source code.
+// TODO: Re-enable bridge once we are tracing replayer behaviors.
+/** @-bridge `cmd/replayer` integration and `pkg/mocker` unit. */
+export function mockSource(
   sourcePath: string,
   sourceText: string
 ): string {
   const source = createSourceFile(sourcePath, sourceText)
-  const instrumented = instrument(source)
+  const mocked = mock(source)
 
-  return printSourceFile(instrumented)
+  return printSourceFile(mocked)
 }
 
 function createSourceFile (

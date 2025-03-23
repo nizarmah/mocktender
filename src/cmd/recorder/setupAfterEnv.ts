@@ -1,6 +1,6 @@
 /* eslint-disable no-var */
-import { __taf, __tag, __tsf, __tsg } from "../../pkg/instrumenter/lib.ts"
 import type { AsyncFn, AsyncGn, SyncFn, SyncGn, TracerFn } from "../../pkg/instrumenter/lib.ts"
+import { __taf, __tag, __tsf, __tsg } from "../../pkg/instrumenter/lib.ts"
 
 declare global {
   // Tracing functions.
@@ -8,6 +8,7 @@ declare global {
   var __taf: TracerFn<AsyncFn>
   var __tsg: TracerFn<SyncGn>
   var __tag: TracerFn<AsyncGn>
+
 
   // Run ID to track unique runs.
   var __rid: string

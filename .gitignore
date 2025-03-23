@@ -11,8 +11,11 @@
 
 !babel.config.js
 !eslint.config.js
-!jest.config.js
 !tsconfig.json
+
+!jest.common.config.js
+!jest.recorder.config.js
+!jest.replayer.config.js
 
 !behaviors.json
 
@@ -23,9 +26,12 @@
 !src/cmd/recorder
 !src/cmd/recorder/testdata
 !src/cmd/recorder/testdata/dummy
+!src/cmd/replayer
 
 !src/pkg
 !src/pkg/instrumenter
+!src/pkg/mocker
 !src/pkg/transformer
 
 !**/*.ts
+!**/*.json
