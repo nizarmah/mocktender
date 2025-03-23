@@ -3,6 +3,8 @@ import { createWriteStream } from "node:fs"
 import path from "node:path"
 import serialize from "serialize-javascript"
 
+import type { Log } from "./types.ts"
+
 export type SyncFn = (...args: unknown[]) => unknown
 export type AsyncFn = (...args: unknown[]) => Promise<unknown>
 export type SyncGn = (...args: unknown[]) => IterableIterator<unknown>
@@ -14,7 +16,7 @@ export type TracerFn<
     | AsyncFn
     | SyncGn
     | AsyncGn
-> = (fn: FunctionType, dir: string, self: unknown, args: unknown[]) => unknown
+> = (fn: FunctionType, filepath: string, self: unknown, args: unknown[]) => unknown
 
 /**
  * Trace calls for a **sync** function.
@@ -28,10 +30,13 @@ export type TracerFn<
  *
  * // Traced code:
  * function test(a: number, b: number) {
+ *   function test(a: number, b: number) {
+ *     return a + b;
+ *   }
+ *
  *   return __tsf(
- *     function test(a: number, b: number) {
- *       return a + b;
- *     },           // reference to the original code
+ *     test,        // reference to the original code
+ *     __filename,  // path of the file containing the original code
  *     this,        // 'this' context (important for class methods)
  *     [a, b],      // arguments as an array
  *   );
@@ -39,18 +44,18 @@ export type TracerFn<
  * ```
  *
  * @param fn - The original synchronous function
- * @param dir - The directory of the file containing the original function
+ * @param filepath - The path of the file containing the original function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns The original function's return value
  */
-export const __tsf: TracerFn<SyncFn> = (fn, dir, self, args) => {
+export const __tsf: TracerFn<SyncFn> = (fn, filepath, self, args) => {
   try {
     const result = fn.apply(self, args)
 
     __l(`sync.func.${fn.name}.return`, {
       name: fn.name,
-      path: dir,
+      path: filepath,
       args,
       result,
     })
@@ -59,7 +64,7 @@ export const __tsf: TracerFn<SyncFn> = (fn, dir, self, args) => {
   } catch (err) {
     __l(`sync.func.${fn.name}.error`, {
       name: fn.name,
-      path: dir,
+      path: filepath,
       args,
       err
     })
@@ -81,15 +86,15 @@ export const __tsf: TracerFn<SyncFn> = (fn, dir, self, args) => {
  *
  * // Traced code:
  * async function fetchData(url: string) {
- *   async function __fn(url: string) {
+ *   async function fetchData(url: string) {
  *     const resp = await fetch(url);
  *     return resp.json();
  *   }
  *
  *   // Then we call __taf with:
  *   return await __taf(
- *     "fetchData",
- *     __fn,
+ *     fetchData,
+ *     __filename,
  *     this,
  *     [url],
  *   );
@@ -97,18 +102,18 @@ export const __tsf: TracerFn<SyncFn> = (fn, dir, self, args) => {
  * ```
  *
  * @param fn - The original async function
- * @param dir - The directory of the file containing the original function
+ * @param filepath - The path of the file containing the original function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns A promise that resolves or rejects exactly like the original async function
  */
-export const __taf: TracerFn<AsyncFn> = async (fn, dir, self, args) => {
+export const __taf: TracerFn<AsyncFn> = async (fn, filepath, self, args) => {
   try {
     const result = await fn.apply(self, args)
 
     __l(`async.func.${fn.name}.return`, {
       name: fn.name,
-      path: dir,
+      path: filepath,
       args,
       result,
     })
@@ -117,7 +122,7 @@ export const __taf: TracerFn<AsyncFn> = async (fn, dir, self, args) => {
   } catch (err) {
     __l(`async.func.${fn.name}.error`, {
       name: fn.name,
-      path: dir,
+      path: filepath,
       args,
       err,
     })
@@ -140,7 +145,7 @@ export const __taf: TracerFn<AsyncFn> = async (fn, dir, self, args) => {
  *
  * // Traced code:
  * function* numbersUpTo(n: number) {
- *   function* __fn(n: number) {
+ *   function* numbersUpTo(n: number) {
  *     for (let i = 0; i < n; i++) {
  *       yield i;
  *     }
@@ -148,8 +153,8 @@ export const __taf: TracerFn<AsyncFn> = async (fn, dir, self, args) => {
  *
  *   // Then we call __tsg with:
  *   return yield* __tsg(
- *     "numbersUpTo",
- *     __fn,
+ *     numbersUpTo,
+ *     __filename,
  *     this,
  *     [n],
  *   );
@@ -157,15 +162,15 @@ export const __taf: TracerFn<AsyncFn> = async (fn, dir, self, args) => {
  * ```
  *
  * @param fn - The original generator function
- * @param dir - The directory of the file containing the original function
+ * @param filepath - The path of the file containing the original function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns An iterator (IterableIterator) that wraps the original generator’s iteration
  */
-export const __tsg: TracerFn<SyncGn> = (fn, dir, self, args) => {
+export const __tsg: TracerFn<SyncGn> = (fn, filepath, self, args) => {
   __l(`sync.gen.${fn.name}.init`, {
     name: fn.name,
-    path: dir,
+    path: filepath,
     args,
   })
 
@@ -175,7 +180,7 @@ export const __tsg: TracerFn<SyncGn> = (fn, dir, self, args) => {
   } catch (err) {
     __l(`sync.gen.${fn.name}.error`, {
       name: fn.name,
-      path: dir,
+      path: filepath,
       args,
       err,
     })
@@ -183,7 +188,7 @@ export const __tsg: TracerFn<SyncGn> = (fn, dir, self, args) => {
     throw err
   }
 
-  return __wsi(fn.name, iterator)
+  return __wsi(fn.name, filepath, iterator)
 }
 
 /**
@@ -200,7 +205,7 @@ export const __tsg: TracerFn<SyncGn> = (fn, dir, self, args) => {
  *
  * // Transformed code might look like:
  * async function* asyncNumbersUpTo(n: number) {
- *   async function* __original(n: number) {
+ *   async function* asyncNumbersUpTo(n: number) {
  *     for (let i = 0; i < n; i++) {
  *       yield i;
  *     }
@@ -208,8 +213,8 @@ export const __tsg: TracerFn<SyncGn> = (fn, dir, self, args) => {
  *
  *   // Then we call __tag with:
  *   return yield* __tag(
- *     "asyncNumbersUpTo",
- *     __original,
+ *     asyncNumbersUpTo,
+ *     __filename,
  *     this,
  *     [n],
  *   );
@@ -217,15 +222,15 @@ export const __tsg: TracerFn<SyncGn> = (fn, dir, self, args) => {
  * ```
  *
  * @param fn - The original async generator function
- * @param dir - The directory of the file containing the original function
+ * @param filepath - The path of the file containing the original function
  * @param self - The `this` context to apply
  * @param args - The arguments passed to the function
  * @returns An async iterator (AsyncIterableIterator) that wraps the original async generator’s iteration
  */
-export const __tag: TracerFn<AsyncGn> = (fn, dir, self, args) => {
+export const __tag: TracerFn<AsyncGn> = (fn, filepath, self, args) => {
   __l(`async.gen.${fn.name}.init`, {
     name: fn.name,
-    path: dir,
+    path: filepath,
     args,
   })
 
@@ -235,7 +240,7 @@ export const __tag: TracerFn<AsyncGn> = (fn, dir, self, args) => {
   } catch (err) {
     __l(`async.gen.${fn.name}.error`, {
       name: fn.name,
-      path: dir,
+      path: filepath,
       args,
       err,
     })
@@ -243,17 +248,23 @@ export const __tag: TracerFn<AsyncGn> = (fn, dir, self, args) => {
     throw err
   }
 
-  return __wai(fn.name, asyncIterator)
+  return __wai(fn.name, filepath, asyncIterator)
 }
 
 // Wraps a **sync** iterator so that .next(), .throw(), .return() all get logged.
-function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIterator<unknown, unknown> {
+function __wsi(
+  fnName: string,
+  filepath: string,
+  iterator: Iterator<unknown, unknown>
+): IterableIterator<unknown, unknown> {
   return {
     next: (input?: unknown) => {
       try {
         const out = iterator.next?.(input)
 
         __l(`sync.gen.${fnName}.next.return`, {
+          name: fnName,
+          path: filepath,
           context: 'next',
           args: input,
           value: out?.value,
@@ -263,6 +274,8 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
         return out
       } catch (err) {
         __l(`sync.gen.${fnName}.next.error`, {
+          name: fnName,
+          path: filepath,
           context: 'next',
           args: input,
           err,
@@ -276,6 +289,8 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
         const out = iterator.throw?.(input)
 
         __l(`sync.gen.${fnName}.throw.return`, {
+          name: fnName,
+          path: filepath,
           context: 'throw',
           args: input,
           value: out?.value,
@@ -285,6 +300,8 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
         return out as IteratorResult<unknown, unknown>
       } catch (err) {
         __l(`sync.gen.${fnName}.throw.error`, {
+          name: fnName,
+          path: filepath,
           context: 'throw',
           args: input,
           err,
@@ -298,6 +315,8 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
         const out = iterator.return?.(input)
 
         __l(`sync.gen.${fnName}.return.return`, {
+          name: fnName,
+          path: filepath,
           context: 'return',
           args: input,
           value: out?.value,
@@ -307,6 +326,8 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
         return out as IteratorResult<unknown, unknown>
       } catch (err) {
         __l(`sync.gen.${fnName}.return.error`, {
+          name: fnName,
+          path: filepath,
           context: 'return',
           args: input,
           err,
@@ -322,13 +343,19 @@ function __wsi(fnName: string, iterator: Iterator<unknown, unknown>): IterableIt
 }
 
 // Wraps an **async** iterator so that .next(), .throw(), .return() all get logged.
-function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): AsyncIterableIterator<unknown, unknown> {
+function __wai(
+  fnName: string,
+  filepath: string,
+  iterator: AsyncIterator<unknown, unknown>
+): AsyncIterableIterator<unknown, unknown> {
   return {
     next: async (input?: unknown) => {
       try {
         const out = await iterator.next?.(input)
 
         __l(`async.gen.${fnName}.next.return`, {
+          name: fnName,
+          path: filepath,
           context: 'next',
           args: input,
           value: out?.value,
@@ -338,6 +365,8 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
         return out
       } catch (err) {
         __l(`async.gen.${fnName}.next.error`, {
+          name: fnName,
+          path: filepath,
           context: 'next',
           args: input,
           err: err,
@@ -351,6 +380,8 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
         const out = await iterator.throw?.(input)
 
         __l(`async.gen.${fnName}.throw.return`, {
+          name: fnName,
+          path: filepath,
           context: 'throw',
           args: input,
           value: out?.value,
@@ -360,6 +391,8 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
         return out as IteratorResult<unknown, unknown>
       } catch (err) {
         __l(`async.gen.${fnName}.throw.error`, {
+          name: fnName,
+          path: filepath,
           context: 'throw',
           args: input,
           err,
@@ -373,6 +406,8 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
         const out = await iterator.return?.(input)
 
         __l(`async.gen.${fnName}.return.return`, {
+          name: fnName,
+          path: filepath,
           context: 'return',
           args: input,
           value: out?.value,
@@ -382,6 +417,8 @@ function __wai(fnName: string, iterator: AsyncIterator<unknown, unknown>): Async
         return out as IteratorResult<unknown, unknown>
       } catch (err) {
         __l(`async.gen.${fnName}.return.error`, {
+          name: fnName,
+          path: filepath,
           context: 'return',
           args: input,
           err,
@@ -413,18 +450,27 @@ const __l = (() => {
   // TODO: Improve this by using dependency injection.
   const logger = new Console(stdout, stderr)
 
-  return (msg: string, data: Record<string, unknown>) => {
-    // Runtime ID ties logs of the same run to handle stateful operations.
-    // Eg. Creating user in DB with same email fails if user already exists.
+  return (
+    msg: string,
+    {
+      name,
+      path,
+      ...data
+    }: Record<string, unknown> & Pick<Log, "name" | "path">
+  ) => {
     // TODO: Improve this by passing it as a parameter to logger.
     const runtimeID = global.__rid
 
-    logger.log(__s({
+    const log: Log = {
       rid: runtimeID,
       time: Date.now(),
+      name,
+      path,
       msg,
       data,
-    }))
+    }
+
+    logger.log(__s(log))
   }
 })()
 

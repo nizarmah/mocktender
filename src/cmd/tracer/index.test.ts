@@ -3,12 +3,7 @@ import { createInterface as createReadline } from "node:readline"
 import path from "node:path"
 import { createReadStream, readFileSync } from "node:fs"
 
-type Log = {
-  rid: string
-  time: number
-  msg: string
-  data: Record<string, unknown>
-}
+import type { Log } from "../../pkg/instrumenter/types.ts"
 
 type TestCase = {
   desc: string
@@ -23,9 +18,9 @@ const tt: TestCase[] = [
     logs: [
       {
         msg: "sync.func.instrumentSource.return",
+        name: "instrumentSource",
+        path: "/Users/nizarmah/Personal/mocktender/src/pkg/instrumenter/client.ts",
         data: {
-          name: "instrumentSource",
-          path: "/Users/nizarmah/Personal/mocktender/src/pkg/instrumenter/client.ts",
           args: [
             "/Users/nizarmah/Personal/mocktender/src/cmd/tracer/testdata/dummy/index.test.ts",
             (
@@ -50,9 +45,9 @@ const tt: TestCase[] = [
       },
       {
         msg: "sync.func.instrumentSource.return",
+        name: "instrumentSource",
+        path: "/Users/nizarmah/Personal/mocktender/src/pkg/instrumenter/client.ts",
         data: {
-          name: "instrumentSource",
-          path: "/Users/nizarmah/Personal/mocktender/src/pkg/instrumenter/client.ts",
           args: [
             "/Users/nizarmah/Personal/mocktender/src/cmd/tracer/testdata/dummy/index.ts",
             (

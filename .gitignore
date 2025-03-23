@@ -14,9 +14,12 @@
 !jest.config.js
 !tsconfig.json
 
+!behaviors.json
+
 !src
 
 !src/cmd
+!src/cmd/mocker
 !src/cmd/tracer
 !src/cmd/tracer/testdata
 !src/cmd/tracer/testdata/dummy

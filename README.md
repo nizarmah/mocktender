@@ -16,9 +16,15 @@ Serves mocks.
     yarn install
     ```
 
-3. Run tests.
+3. Record tests.
 
     ```bash
-    # rm tracer.stdout.log tracer.stderr.log
-    yarn dev
+    yarn test:record
+    # yarn test:record:dry-run
+    ```
+
+4. Replay tests.
+
+    ```bash
+    yarn test:replay
     ```

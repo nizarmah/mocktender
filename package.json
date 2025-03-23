@@ -4,8 +4,13 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "clean": "rm -f tracer.stdout.log tracer.stderr.log",
     "lint": "eslint --fix",
-    "dev": "yarn build && node --experimental-strip-types ./node_modules/.bin/jest"
+    "test:record": "yarn test:record:run && yarn test:record:cache",
+    "test:replay": "echo 'todo'",
+    "test:record:dry-run": "yarn test:record:run",
+    "test:record:run": "yarn clean && yarn build && node --experimental-strip-types ./node_modules/.bin/jest",
+    "test:record:cache": "yarn build && node --experimental-strip-types ./src/cmd/mocker/index.ts ./tracer.stdout.log ./behaviors.json"
   },
   "peerDependencies": {
     "@jest/transform": "^29",
