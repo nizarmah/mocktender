@@ -2,29 +2,16 @@
 
 Serves mocks.
 
+## Objectives
+
+1. Test a codebase through its entrypoints.
+1. Eventually, only run codebase through tests.
+1. One day, simulate e2e tests with unit tests.
+
+## Example
+
+Check [`example`](./example).
+
 ## Development
 
-1. Use NodeJS LTS.
-
-    ```bash
-    nvm use --lts
-    ```
-
-2. Install dependencies.
-
-    ```bash
-    yarn install
-    ```
-
-3. Record tests.
-
-    ```bash
-    yarn test:record
-    # yarn test:record:dry-run
-    ```
-
-4. Replay tests.
-
-    ```bash
-    yarn test:replay
-    ```
+Check [`src`](./src).

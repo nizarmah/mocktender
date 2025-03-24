@@ -6,6 +6,8 @@
 
 !README.md
 
+!docker-compose.yml
+
 !package.json
 !yarn.lock
 
@@ -19,6 +21,7 @@
 
 !behaviors.json
 
+!example
 !src
 
 !src/cmd

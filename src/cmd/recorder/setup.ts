@@ -10,5 +10,5 @@ declare global {
 
 // TODO: Scope the values to the test suite that's running.
 // In case two tests are running in parallel, they will overwrite one another.
-global.__tracerStdout = path.join(process.cwd(), "tracer.stdout.log")
-global.__tracerStderr = path.join(process.cwd(), "tracer.stderr.log")
+global.__tracerStdout = process.env.TRACER_STDOUT ?? path.join(process.cwd(), "tracer.stdout.log")
+global.__tracerStderr = process.env.TRACER_STDERR ?? path.join(process.cwd(), "tracer.stderr.log")

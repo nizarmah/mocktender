@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  mocktender:
+    tty: true
+    stdin_open: true
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: |
+      sh -c "yarn install --frozen-lockfile && \
+             echo 'Usage: dc run --rm mocktender sh'"

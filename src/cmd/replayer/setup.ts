@@ -7,4 +7,4 @@ declare global {
 }
 
 // TODO: Provide the value from a Jest custom ENV.
-global.__behaviorCache = path.join(process.cwd(), "behaviors.json")
+global.__behaviorCache = process.env.BEHAVIOR_CACHE ?? path.join(process.cwd(), "behaviors.json")

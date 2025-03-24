@@ -3,6 +3,15 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
+    "//": "Scripts for ./example",
+    "example:clean": "rm -f example/*.log",
+    "example:record": "yarn example:clean && yarn build && yarn example:record:run && yarn example:record:cache",
+    "example:record:run": "TRACER_STDOUT=./example/tracer.stdout.log TRACER_STDERR=./example/tracer.stderr.log node --experimental-strip-types ./node_modules/.bin/jest --config jest.recorder.config.js example/server.test.ts",
+    "example:record:cache": "node --experimental-strip-types ./src/cmd/behavior-cacher/index.ts ./example/tracer.stdout.log ./example/behaviors.json",
+    "example:replay": "yarn example:clean && yarn build && yarn example:replay:run",
+    "example:replay:run": "BEHAVIOR_CACHE=./example/behaviors.json node --experimental-strip-types ./node_modules/.bin/jest --config jest.replayer.config.js example/server.test.ts example/handlers.test.ts",
+
+    "//": "Scripts for development",
     "build": "tsc",
     "clean": "rm -rf *.log",
     "lint": "eslint --fix",

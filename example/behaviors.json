@@ -1,0 +1,28 @@
+{
+    "\u002Fapp\u002Fexample\u002Fhandlers.ts": {
+        "helloHandler": {
+            "greeting.default": [
+                {
+                    "args": [
+                        "\u002Fhello"
+                    ],
+                    "result": {
+                        "status": 200,
+                        "body": "Hello, world!"
+                    }
+                }
+            ],
+            "greeting.withName": [
+                {
+                    "args": [
+                        "\u002Fhello?name=John"
+                    ],
+                    "result": {
+                        "status": 200,
+                        "body": "Hello, John!"
+                    }
+                }
+            ]
+        }
+    }
+}
