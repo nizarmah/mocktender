@@ -20,6 +20,7 @@ Check [`example`](./example#mocktenderexample).
 Only a proof of concept right now, but actively being developed.
 
 If you need it, let me know — [nizar.mah99@gmail.com](mailto:nizar.mah99@gmail.com).
+It can be reproduced in different languages.
 
 ## Objectives
 
