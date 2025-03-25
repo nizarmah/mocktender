@@ -1,6 +1,6 @@
 # mocktender/src
 
-Guide for developers.
+Technical guide for developers.
 
 ## Architecture
 
@@ -9,13 +9,11 @@ Guide for developers.
 For recording and replaying, we hijack file imports and transform them based on our needs.
 
 Recorder wraps function definitions with a proxy that records the arguments and result.
-
 Replayer replaces function implementations with stubs that replay the recorded behavior.
 
 ### Behavior caching
 
 Recorder streams behavior logs into a file to avoid slowing down the tests.
-
 The logs can then be transformed into data structures that match our needs.
 
 At the moment, we only record:
@@ -32,25 +30,22 @@ Search the codebase for `FIXME` and `TODO` to find known issues.
 
 ## Development
 
-### Setup
-
 1. Setup container.
-
     ```bash
     dc up mocktender
+    ```
+
+1. Run container.
+    ```bash
     dc run --rm mocktender sh
     ```
 
-### Test
-
-1. Test recorder.
-
+1. Test recorder. (inside container)
     ```bash
     yarn test:record
     ```
 
-1. Test replayer.
-
+1. Test replayer. (inside container)
     ```bash
     yarn test:replay
     ```
