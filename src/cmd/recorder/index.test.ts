@@ -14,19 +14,14 @@ type TestCase = {
 // Currently, writing the traces to a single file makes it not possible.
 const tt: TestCase[] = [
   {
-    desc: "recorder-dummy",
+    desc: "behavior.trace.dummy",
     test: "testdata/dummy/index.test.ts",
     want: "testdata/dummy/behaviors.recorder.json"
   },
 ]
 
 describe("recorder", () => {
-  it.each(tt)("traces behavior for: $desc", async (tc) => {
-    // We set the RID so we can reference it later during replays.
-    // This is super hacky at the moment, because it's the cheapest solution.
-    // TODO: infer this using combining test path, suite name, & name in a custom Jest Env.
-    global.__rid = tc.desc
-
+  it.each(tt)("$desc", async (tc) => {
     // Programmatically runs Jest so the Recorder instruments itself.
     // Usually, when running the Recorder with Jest, we only get the tested code behavior.
     // With this workaround, we get the Recorder's behavior as well.
@@ -37,16 +32,17 @@ describe("recorder", () => {
 
     // Ensure there are no errors.
     const stderr = readFileSync(
-      global.__tracerStderr,
+      __filename.replace(/\.test\.ts$/, ".trace.err"),
       { encoding: "utf-8" }
     )
     expect(stderr).toBe("")
 
     // Cache the behaviors.
     await runBehaviorCacher([
-      global.__tracerStdout,
       // TODO: Make this dynamic to support multiple test cases.
-      path.join(process.cwd(), `behaviors.json`)
+      path.join(process.cwd(), `behaviors.json`),
+      __filename.replace(/\.test\.ts$/, ".trace.log"),
+      path.join(__dirname, tc.test.replace(/\.test\.ts$/, ".trace.log"))
     ])
 
     // Compare behaviors.

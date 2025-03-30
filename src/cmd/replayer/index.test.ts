@@ -4,9 +4,7 @@ import path from "node:path"
 import * as instrumenter from "../../pkg/instrumenter/monkeypatch.ts"
 
 describe("replayer", () => {
-  it("uses mocked recorder-dummy behaviors", async () => {
-    global.__rid = "recorder-dummy"
-
+  it("behavior.trace.dummy", async () => {
     const spyInstrument = jest.spyOn(instrumenter, "instrument")
 
     // The replayer transformer from the parent context mocks

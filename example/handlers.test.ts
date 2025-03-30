@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs"
-import { helloHandler, handleHello } from "./handlers.ts"
 import path from "node:path"
+
+import { helloHandler } from "./handlers.ts"
+import * as utils from "./utils.ts"
 
 type TestCase = {
   desc: string
@@ -30,16 +32,22 @@ describe("handlers.replay", () => {
     }))
 
   it.each(tt)("$desc", (tc) => {
-    global.__rid = tc.desc
-
     expect(tc.steps.length).toBeGreaterThan(0)
 
     for (const step of tc.steps) {
-      // FIXME: Refer to `handlers.ts`.
-      // const got = helloHandler(tc.url)
-      const got = handleHello(...step.args as [string])
+      const got = helloHandler(...step.args as [string])
 
       expect(got).toStrictEqual(step.result)
     }
+  })
+
+  // Ensures that the bridge is not mocked during replay.
+  // This is only for demo purposes.
+  it('does call greet', () => {
+    const greetSpy = jest.spyOn(utils, "greet")
+
+    helloHandler("/hello?name=John")
+
+    expect(greetSpy).toHaveBeenCalledWith("John")
   })
 })

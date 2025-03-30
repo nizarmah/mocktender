@@ -78,11 +78,6 @@ function wrapperProcessor<
     transformerConfig: options.transformerConfig?.transformer?.config
   }
 
-  // Only support TS files for now.
-  if (!sourcePath.endsWith(".ts")) {
-    return nextProcess(sourceText, sourcePath, transformerOptions) as R
-  }
-
   const processed = preprocessor(sourceText, sourcePath)
 
   return nextProcess(processed, sourcePath, transformerOptions) as R

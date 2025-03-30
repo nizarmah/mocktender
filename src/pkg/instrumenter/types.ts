@@ -19,3 +19,19 @@ export declare type Log = {
   // Path is the function filename: `__filename`.
   path: string
 }
+
+export type LoggerFn = (
+  msg: string, data: Record<string, unknown> & Pick<Log, "name" | "path">) => void
+
+export type SyncFn = (...args: unknown[]) => unknown
+export type AsyncFn = (...args: unknown[]) => Promise<unknown>
+export type SyncGn = (...args: unknown[]) => IterableIterator<unknown>
+export type AsyncGn = (...args: unknown[]) => AsyncIterableIterator<unknown>
+
+export type TracerFn<
+  FunctionType extends
+    | SyncFn
+    | AsyncFn
+    | SyncGn
+    | AsyncGn
+> = (fn: FunctionType, filepath: string, self: unknown, args: unknown[]) => unknown

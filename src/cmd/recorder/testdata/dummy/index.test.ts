@@ -48,8 +48,6 @@ describe("dummy", () => {
   })
 
   it.each(tt)("$desc", async (tc) => {
-    global.__rid = tc.desc
-
     const res = await fetch(`http://localhost:8080${tc.url}`)
 
     const gotStatus = res.status

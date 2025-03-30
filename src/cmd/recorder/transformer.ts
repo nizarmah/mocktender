@@ -9,6 +9,11 @@ export { defaultConfig } from "../../pkg/transformer/index.ts"
 // Jest requires the factory to be a default export.
 export default createFactory(
   (sourceText, sourcePath) => {
+    // Only support TS files for now.
+    if (!sourcePath.endsWith(".ts")) {
+      return sourceText
+    }
+
     return instrumentSource(sourcePath, sourceText)
   }
 )
